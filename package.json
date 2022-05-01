@@ -8,7 +8,8 @@
   "scripts": {
     "start": "quasar dev",
     "build": "quasar build",
-    "electron": "quasar dev -m electron"
+    "electron": "quasar dev -m electron",
+    "electron-debug": "quasar dev --debug -m electron -t mat -- --remote-debugging-port=9222"
   },
   "dependencies": {
     "@ag-grid-community/client-side-row-model": "^27.2.1",

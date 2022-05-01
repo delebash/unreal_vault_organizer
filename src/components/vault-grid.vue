@@ -122,7 +122,7 @@ export default {
 
       let entitlements
       entitlements = await window.myNodeApi.api_fetch(entitlement_url + count_params1, fetch_options)
-      //   console.log(entitlements)
+      // console.log(entitlements)
       await this.getCatalogItems(catalog_url, entitlements)
       //
       // fetch_options.method = 'GET'
@@ -144,52 +144,32 @@ export default {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
 
-      let arrCatalog =[]
+      let arrCatalog = []
       let start = 0
-      let id = 0
       let entitlements_length = entitlements.length
       let response
       let form_body = ''
 
-      if (entitlements_length <= 100) {
-        while (start <= entitlements_length) {
-          let catalog_Itemid = entitlements[start].catalogItemId
-          form_body = form_body + 'id=' + catalog_Itemid + '&'
-          start = start + 1
-        }
-        //post data
-        fetch_options.body = form_body.slice(0, -1);
-        response = await window.myNodeApi.api_fetch(catalog_url, fetch_options)
-        arrCatalog.push(response)
-        form_body = ''
-        start = 0
-      } else {
-        let num_array = new Array(Math.floor(entitlements_length / 100)).fill(100).concat(entitlements_length % 100)
-
-        for (let number in num_array) {
-          while (start <= number) {
-            let catalog_Itemid = entitlements[id].catalogItemId
-            form_body = form_body + 'id=' + catalog_Itemid + '&'
-            start = start + 1
-            id = id + 1
-          }
-          //post data
-          fetch_options.body = form_body.slice(0, -1);
-          response = await window.myNodeApi.api_fetch(catalog_url, fetch_options)
-         console.log(response)
-          // arrCatalog.push(response)
-          form_body = ''
-          start = 0
-        }
+      while (start <= entitlements_length - 1) {
+        let catalog_Itemid = entitlements[start].catalogItemId
+        form_body = form_body + 'id=' + catalog_Itemid + '&'
+        start = start + 1
       }
-    console.log(arrCatalog)
+      //post data
+      fetch_options.body = form_body.slice(0, -1);
+      response = await window.myNodeApi.api_fetch(catalog_url, fetch_options)
+      for (let obj in response) {
+        arrCatalog.push(obj)
+      }
+      await db.put('vault-item-userdata', arrCatalog, 'vault_catalog');
+      return arrCatalog
     },
     async getToken() {
       let snifferPath = 'Fiddler.exe'
       let launchaerPath = 'F:\\Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe'
       let data = await window.myNodeApi.launchSniffer(snifferPath, launchaerPath)
 
-     const dataArray = data.split(",");
+      const dataArray = data.split(",");
       let token = dataArray[0].toString()
       let url = dataArray[1].toString()
       let tmpStr = url.match("v1/(.*)/s");
