@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme, Menu, MenuItem } from 'electron'
+import { app, BrowserWindow, nativeTheme, Menu, MenuItem , shell} from 'electron'
 import path from 'path'
 import os from 'os'
 
@@ -57,6 +57,14 @@ function createWindow () {
 
   //mainWindow.setMenu(null);
   mainWindow.loadURL(process.env.APP_URL)
+
+  // This is the actual solution
+  mainWindow.webContents.on("new-window", function(event, url) {
+    event.preventDefault();
+    // com.epicgames.launcher://ue/marketplace/item/
+    console.log(url)
+    shell.openExternal(url);
+  });
 
   if (process.env.DEBUGGING) {
     // if on DEV or Production with debug enabled

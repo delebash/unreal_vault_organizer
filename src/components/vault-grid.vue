@@ -1,10 +1,5 @@
 <template>
   <div id="app">
-
-    <q-btn class="q-pt-none" dense @click="parseData()" color="primary"
-           label="Refresh Data"></q-btn>
-    <q-btn class="q-pt-none" dense @click="getToken()" color="primary"
-           label="GetToken"></q-btn>
     <q-btn class="q-pt-none" dense @click="getVault()" color="primary"
            label="Get Vault Items"></q-btn>
 
@@ -41,8 +36,6 @@ import {ClientSideRowModelModule} from '@ag-grid-community/client-side-row-model
 
 
 let db
-
-
 let fetch_options = {
   method: '',
   headers: {},
@@ -86,16 +79,19 @@ export default {
           // The 'id' property of the object will be the key.
           //  keyPath: 'catalogItemId'
         });
-        const metadata = db.createObjectStore('vault-item-userdata', {
+        const vault_user_data = db.createObjectStore('vault_user_data', {
           // The 'id' property of the object will be the key.
           //  keyPath: 'catalogItemId'
         });
-        // Create an index on the 'date' property of the objects.
-        // store.createIndex('date', 'date');
+        const tags = db.createObjectStore('tags', {
+          // The 'id' property of the object will be the key.
+          keyPath: 'id',
+          autoIncrement: true
+        });
       },
     });
-
-    await this.loadData()
+    this.catalogItems = await db.get('vault', 'vault_catalog') || [];
+    await this.loadGrid()
   },
   created() {
     this.rowSelection = 'multiple';
@@ -105,8 +101,8 @@ export default {
   methods: {
     async getVault() {
 
-      this.unreal_token = await db.get('vault-item-userdata', 'unreal_token')
-      this.account_number = await db.get('vault-item-userdata', 'account_number')
+      this.unreal_token = await db.get('vault', 'unreal_token')
+      this.account_number = await db.get('vault', 'account_number')
 
       let catalog_url = 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/ue/bulk/items?includeDLCDetails=false&includeMainGameDetails=false&country=US&locale=en'
       let entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/' + this.account_number + '/entitlements'
@@ -122,8 +118,10 @@ export default {
 
       let entitlements
       entitlements = await window.myNodeApi.api_fetch(entitlement_url + count_params1, fetch_options)
-      // console.log(entitlements)
+
       await this.getCatalogItems(catalog_url, entitlements)
+      this.catalogItems = await db.get('vault', 'vault_catalog');
+      await this.loadGrid();
       //
       // fetch_options.method = 'GET'
       // fetch_options.headers = {
@@ -132,7 +130,7 @@ export default {
       // }
       //
       // entitlements = await window.myNodeApi.api_fetch(entitlement_url + count_params2, fetch_options)
-      // //  console.log(entitlements)
+
       // await this.getCatalogItems(catalog_url,entitlements)
 
     },
@@ -144,11 +142,12 @@ export default {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
 
-      let arrCatalog = []
-      let start = 0
-      let entitlements_length = entitlements.length
-      let response
+      let arrCatalog = [];
+      let start = 0;
+      let entitlements_length = entitlements.length || [];
+      let response;
       let form_body = ''
+      let val;
 
       while (start <= entitlements_length - 1) {
         let catalog_Itemid = entitlements[start].catalogItemId
@@ -158,27 +157,13 @@ export default {
       //post data
       fetch_options.body = form_body.slice(0, -1);
       response = await window.myNodeApi.api_fetch(catalog_url, fetch_options)
-      for (let obj in response) {
-        arrCatalog.push(obj)
+
+      for (val of Object.values(response)) {
+        arrCatalog.push(val)
       }
-      await db.put('vault-item-userdata', arrCatalog, 'vault_catalog');
-      return arrCatalog
+      await db.put('vault', arrCatalog, 'vault_catalog');
     },
-    async getToken() {
-      let snifferPath = 'Fiddler.exe'
-      let launchaerPath = 'F:\\Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe'
-      let data = await window.myNodeApi.launchSniffer(snifferPath, launchaerPath)
 
-      const dataArray = data.split(",");
-      let token = dataArray[0].toString()
-      let url = dataArray[1].toString()
-      let tmpStr = url.match("v1/(.*)/s");
-      let account_number = tmpStr[1];
-      console.log(account_number)
-      await db.put('vault-item-userdata', token, 'unreal_token');
-      await db.put('vault-item-userdata', account_number, 'account_number');
-
-    },
     onSelectionChanged() {
       let that = this
       let selectedRows = this.gridApi.getSelectedRows();
@@ -191,7 +176,7 @@ export default {
     // async setData() {
     //   let meta = {}
     //   meta.comment = "hhhh"
-    //   await db.put('vault-item-userdata', meta, this.selectedRowId);
+    //   await db.put('vault', meta, this.selectedRowId);
     //   let rowNode = this.gridApi.getRowNode(this.selectedRowId);
     //   rowNode.setDataValue('comment', meta.comment);
     // },
@@ -202,36 +187,7 @@ export default {
     onFirstDataRendered(params) {
       // params.api.sizeColumnsToFit();
     },
-
-    async parseData() {
-      this.gridApi.showLoadingOverlay();
-      let vaultUrl = 'https://www.unrealengine.com/marketplace/api/assets/vault?lang=en-US'
-      let count = 100
-      let start = 0
-      let total = 0
-      let catalogItems = []
-      do {
-        let pageUrl = vaultUrl + '&start=' + start + '&count=' + count
-        let json = await this.fetchData(pageUrl)
-        const data = json.data
-        if (json.status === 'OK') {
-          count = data.paging.count
-          start = data.paging.start
-          total = data.paging.total
-        }
-        start = start + count
-        catalogItems.push(...data.elements)
-        // i = 2
-      }
-      while (start < total);
-      // while (i < 2);
-      await this.saveData(catalogItems)
-      await this.loadData()
-      this.gridApi.hideOverlay();
-    },
-    async loadData() {
-      this.catalogItems = await db.getAll('vault')
-      this.getRowNodeId = data => data.catalogItemId;
+    async loadGrid() {
       if (this.catalogItems.length > 0) {
         let rows = []
         this.columnDefs = [
@@ -250,38 +206,47 @@ export default {
             width: 320,
             field: "thumbnail",
             cellRenderer: function (params) {
-              let thumbnail = params.data.thumbnail;
-              let url = "https://www.unrealengine.com/marketplace/en-US/item/" + params.data.catalogItemId;
-              let img = `<a href=${url} target="_blank"><img src= ${thumbnail}>`;
+              let thumbnail_url = params.data.thumbnail_url;
+              let Marketplace_url = "https://www.unrealengine.com/marketplace/en-US/item/" + params.data.id;
+              let launcher_url = "com.epicgames.launcher://ue/marketplace/item/" + params.data.id;
+              let img = `<a href=${launcher_url} target="_blank"><img  width="50" height="50" src= ${thumbnail_url}>`;
               return img;
             }
           },
-          {
-            headerName: "Comment",
-            field: "comment",
-            wrapText: true,
-            cellEditor: 'agLargeTextCellEditor',
-            valueSetter: (params) => {
-              let newVal = params.newValue;
-              let valueChanged = params.data.comment !== newVal;
-              if (valueChanged) {
-                params.data.comment = newVal;
-              }
-              return valueChanged;
-            },
-          }
+          // {
+          //   headerName: "Comment",
+          //   field: "comment",
+          //   wrapText: true,
+          //   cellEditor: 'agLargeTextCellEditor',
+          //   valueSetter: (params) => {
+          //     let newVal = params.newValue;
+          //     let valueChanged = params.data.comment !== newVal;
+          //     if (valueChanged) {
+          //       params.data.comment = newVal;
+          //     }
+          //     return valueChanged;
+          //   },
+          // }
         ];
         // <a href=${url}>
         //Get data from idb and fill rows
+        //
+        let thumbnail_url
 
         for (let i = 0; i < this.catalogItems.length; i++) {
-          let userItemInfo = await db.get('vault-item-userdata', this.catalogItems[i].catalogItemId)
+          for (let image of this.catalogItems[i].keyImages){
+            if (image.type === 'Thumbnail') {
+              thumbnail_url = image.url
+              break
+            }
+          }
+
           rows.push({
-            catalogItemId: this.catalogItems[i].catalogItemId,
+            id: this.catalogItems[i].id,
             title: this.catalogItems[i].title,
             description: this.catalogItems[i].description,
-            thumbnail: this.catalogItems[i].thumbnail,
-            comment: userItemInfo.comment
+           thumbnail_url : thumbnail_url
+            // comment: userItemInfo.comment
           })
         }
         this.rowData = rows
@@ -295,9 +260,9 @@ export default {
         let catalogItem = data[i]
         let catalogItemId = data[i].catalogItemId
         await db.put('vault', catalogItem, catalogItemId);
-        let rowExists = await db.get('vault-item-userdata', catalogItemId);
+        let rowExists = await db.get('vault', catalogItemId);
         if (rowExists == null) {
-          await db.put('vault-item-userdata', meta, catalogItemId);
+          await db.put('vault', meta, catalogItemId);
         }
       }
     },
@@ -308,7 +273,7 @@ export default {
       meta.comment = comment
       // let anotherfield = event.data.anotherfield
       // meta.anotherfield = anotherfield
-      db.put('vault-item-userdata', meta, catalogItemId);
+      db.put('vault', meta, catalogItemId);
     }
   }
 }
