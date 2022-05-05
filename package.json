@@ -12,10 +12,9 @@
     "electron-debug": "quasar dev --debug -m electron -t mat -- --remote-debugging-port=9222"
   },
   "dependencies": {
-    "@ag-grid-community/client-side-row-model": "^27.2.1",
-    "@ag-grid-community/core": "^27.2.1",
-    "@ag-grid-community/vue3": "^27.2.1",
     "@quasar/extras": "^1.13.6",
+    "ag-grid-community": "^27.2.1",
+    "ag-grid-vue3": "^27.2.1",
     "idb": "^7.0.1",
     "node-fetch": "^2.6.7",
     "quasar": "^2.6.6",

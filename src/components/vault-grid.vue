@@ -1,11 +1,11 @@
 <template>
   <div id="app">
+
     <q-btn class="q-pt-none" dense @click="getVault()" color="primary"
            label="Get Vault Items"></q-btn>
-
     <ag-grid-vue
-      style="width: 100%; height: 95%;"
-      class="ag-theme-material"
+      style="width: 100%; height: 73%;"
+      class="ag-theme-alpine"
       id="myGrid"
       :columnDefs="columnDefs"
       @grid-ready="onGridReady"
@@ -13,7 +13,6 @@
       :rowData="rowData"
       :getRowNodeId="getRowNodeId"
       :rowSelection="rowSelection"
-      :modules="modules"
       :overlayLoadingTemplate="overlayLoadingTemplate"
       @cell-value-changed="onCellValueChanged"
       @selection-changed="onSelectionChanged"
@@ -29,11 +28,11 @@
 
 import {ref} from 'vue'
 import {openDB} from 'idb';
-import "@ag-grid-community/core/dist/styles/ag-grid.css";
-import "@ag-grid-community/core/dist/styles/ag-theme-alpine.css";
-import {AgGridVue} from "@ag-grid-community/vue3";
-import {ClientSideRowModelModule} from '@ag-grid-community/client-side-row-model'
-
+import "ag-grid-community/dist/styles/ag-grid.css";
+import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+import {AgGridVue} from "ag-grid-vue3";
+// import {ClientSideRowModelModule} from '@ag-grid-community/client-side-row-model'
+import TagSelect from '../components/tag-select.vue'
 
 let db
 let fetch_options = {
@@ -46,11 +45,28 @@ let fetch_options = {
 export default {
   components: {
     AgGridVue,
+    TagSelect
+
   },
   setup() {
+    // Gets called once before editing starts, to give editor a chance to
+    // cancel the editing before it even starts.
+    const isCancelBeforeStart = () => {
+      return false;
+    };
+
+    // Gets called once when editing is finished (eg if Enter is pressed).
+    // If you return true, then the result of the edit will be ignored.
+    const isCancelAfterEnd = () => {
+      // our editor will reject any value greater than 1000
+      return false
+    };
     return {
-      modules: [ClientSideRowModelModule],
+      isCancelAfterEnd,
+      isCancelBeforeStart,
+      modules: [],
       columnDefs: ref([]),
+      tag_info_options: ref([]),
       catalogItems: [],
       gridApi: null,
       columnApi: null,
@@ -91,6 +107,8 @@ export default {
       },
     });
     this.catalogItems = await db.get('vault', 'vault_catalog') || [];
+    this.tag_info_options = await db.getAll('tags') || [];
+    //  console.log(this.tag_info_options)
     await this.loadGrid()
   },
   created() {
@@ -190,10 +208,19 @@ export default {
     async loadGrid() {
       if (this.catalogItems.length > 0) {
         let rows = []
+        let labels = []
+        for (let tag of this.tag_info_options) {
+          labels.push(tag.label)
+        }
         this.columnDefs = [
           // {headerName: "ID", field: "catalogItemId", editable: false},
           {
-            headerName: "Title", field: "title", editable: false, wrapText: true, cellRenderer: function (params) {
+            headerName: "Title",
+            field: "title",
+            editable: false,
+            wrapText: true,
+            width: 300,
+            cellRenderer: function (params) {
               let title = params.data.title;
               let myTitle = `<div>${title}</div>`;
               return myTitle;
@@ -202,8 +229,7 @@ export default {
           {
             headerName: "Image",
             editable: false,
-            autoHeight: true,
-            width: 320,
+            width: 94,
             field: "thumbnail",
             cellRenderer: function (params) {
               let thumbnail_url = params.data.thumbnail_url;
@@ -213,40 +239,30 @@ export default {
               return img;
             }
           },
-          // {
-          //   headerName: "Comment",
-          //   field: "comment",
-          //   wrapText: true,
-          //   cellEditor: 'agLargeTextCellEditor',
-          //   valueSetter: (params) => {
-          //     let newVal = params.newValue;
-          //     let valueChanged = params.data.comment !== newVal;
-          //     if (valueChanged) {
-          //       params.data.comment = newVal;
-          //     }
-          //     return valueChanged;
-          //   },
-          // }
+          {
+            headerName: 'Tags',
+            field: 'tags',
+            autoHeight: true,
+            cellRenderer: 'TagSelect',
+            width: 300,
+          },
         ];
-        // <a href=${url}>
-        //Get data from idb and fill rows
-        //
+
         let thumbnail_url
 
         for (let i = 0; i < this.catalogItems.length; i++) {
-          for (let image of this.catalogItems[i].keyImages){
+          for (let image of this.catalogItems[i].keyImages) {
             if (image.type === 'Thumbnail') {
               thumbnail_url = image.url
               break
             }
           }
-
           rows.push({
             id: this.catalogItems[i].id,
             title: this.catalogItems[i].title,
             description: this.catalogItems[i].description,
-           thumbnail_url : thumbnail_url
-            // comment: userItemInfo.comment
+            thumbnail_url: thumbnail_url,
+            tags: 'vvv'
           })
         }
         this.rowData = rows
@@ -266,16 +282,40 @@ export default {
         }
       }
     },
+    extractValues(mappings) {
+      // let arrLabel = []
+      // for (let tag of tags) {
+      //   arrLabel.push(tag.label)
+      // }
+      // return arrLabel
+      return Object.keys(mappings);
+    },
     onCellValueChanged(event) {
-      let catalogItemId = event.data.catalogItemId
-      let meta = {}
-      let comment = event.data.comment
-      meta.comment = comment
-      // let anotherfield = event.data.anotherfield
-      // meta.anotherfield = anotherfield
-      db.put('vault', meta, catalogItemId);
+      //let catalogItemId = event.data.catalogItemId
+      // let meta = {}
+      // let comment = event.data.comment
+      // meta.comment = comment
+      // // let anotherfield = event.data.anotherfield
+      // // meta.anotherfield = anotherfield
+      // db.put('vault', meta, catalogItemId);
     }
   }
 }
 
+
+
+// {
+//   headerName: "Comment",
+//   field: "comment",
+//   wrapText: true,
+//   cellEditor: 'agLargeTextCellEditor',
+//   valueSetter: (params) => {
+//     let newVal = params.newValue;
+//     let valueChanged = params.data.comment !== newVal;
+//     if (valueChanged) {
+//       params.data.comment = newVal;
+//     }
+//     return valueChanged;
+//   },
+// }
 </script>

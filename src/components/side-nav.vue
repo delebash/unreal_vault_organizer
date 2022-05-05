@@ -90,9 +90,7 @@ export default {
   setup() {
 
     return {
-
       tags: ref([]),
-
       new_tags: ref([]),
       tag_clicked: {},
       tag_info_options: ref([]),
