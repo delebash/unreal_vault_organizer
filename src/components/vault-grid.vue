@@ -32,7 +32,7 @@ import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import {AgGridVue} from "ag-grid-vue3";
 // import {ClientSideRowModelModule} from '@ag-grid-community/client-side-row-model'
-import TagSelect from '../components/tag-select.vue'
+import TagGridSelect from './tag-grid-select.vue'
 
 let db
 let fetch_options = {
@@ -45,7 +45,7 @@ let fetch_options = {
 export default {
   components: {
     AgGridVue,
-    TagSelect
+    TagGridSelect
 
   },
   setup() {
@@ -116,7 +116,6 @@ export default {
     await this.loadGrid()
   },
   created() {
-    // this.getRowId = (params) => params.data.id;
     this.rowSelection = 'multiple';
     this.overlayLoadingTemplate =
       '<span class="ag-overlay-loading-center">Please wait while your rows are loading. This could take a minute to refresh your data.</span>';
@@ -253,10 +252,7 @@ export default {
             field: 'tags',
             autoHeight: true,
             editable: false,
-            cellRenderer: 'TagSelect',
-            cellRendererParams: {
-              tags_listed: 'irishGreen'
-            },
+            cellRenderer: 'TagGridSelect',
             width: 300,
           },
         ];
@@ -279,6 +275,14 @@ export default {
         }
         this.rowData = rows
       }
+    },
+    async getTags(params) {
+
+     // console.log(params)
+      //let id = row.data.id
+      //let results =  await db.get('tags', tag_id) || [];
+      // console.log(row)
+      return 'test'
     },
     async saveData(data) {
       let meta = {

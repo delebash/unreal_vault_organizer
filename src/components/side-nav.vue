@@ -14,9 +14,25 @@
       input-debounce="0"
       :options="tag_info_options"
       @new-value="createValue"
-      style="width: 400px"
-    />
+      style="max-width: 200px"
+    >
+
+      <template v-slot:option="scope">
+        <q-item
+          v-bind="scope.itemProps"
+        >
+          <q-item-section>
+            <q-item-label v-html="scope.opt.label"></q-item-label>
+          </q-item-section>
+          <q-item-section avatar>
+            <q-avatar :color=scope.opt.color></q-avatar>
+          </q-item-section>
+        </q-item>
+      </template>
+
+    </q-select>
   </div>
+
   <span v-for="tag in tag_info_options">
           <q-chip
             removable
@@ -27,7 +43,7 @@
             @click="selectedTag(tag)"
             :color=tag.color
           >
-            <div>{{ tag.label }}</div>
+            <div class="q-pl-md q-ma-xs">{{ tag.label }}</div>
       </q-chip>
   </span>
 
@@ -131,18 +147,15 @@ export default {
   },
   methods: {
     filterGrid(selected_tags) {
-     // console.log(selected_tags)
+      // console.log(selected_tags)
     },
     selectedTag(tag) {
       if (tag.selected === true) {
-        tag.selected = true
         this.selected_tags.push(tag)
       } else {
-        tag.selected = false
         const index = this.selected_tags.findIndex(({label}) => label === tag.label);
         this.selected_tags.splice(index, 1)
       }
-      this.filterGrid(this.selected_tags)
     },
     async saveTagInfo() {
       this.tag_clicked.label = this.tag_label
