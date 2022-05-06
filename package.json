@@ -15,6 +15,7 @@
     "@quasar/extras": "^1.13.6",
     "ag-grid-community": "^27.2.1",
     "ag-grid-vue3": "^27.2.1",
+    "electron-context-menu": "^3.1.2",
     "idb": "^7.0.1",
     "node-fetch": "^2.6.7",
     "quasar": "^2.6.6",

@@ -69,7 +69,7 @@ export default {
       tag_info_options: ref([]),
       catalogItems: [],
       gridApi: null,
-      columnApi: null,
+      gridColumnApi: null,
       rowData: ref([]),
       getRowNodeId: null,
       selectedRowId: null,
@@ -104,6 +104,10 @@ export default {
           keyPath: 'id',
           autoIncrement: true
         });
+        const additional_row_info = db.createObjectStore('additional_row_info', {
+          // The 'id' property of the object will be the key.
+          keyPath: 'catalogItemId'
+        });
       },
     });
     this.catalogItems = await db.get('vault', 'vault_catalog') || [];
@@ -112,6 +116,7 @@ export default {
     await this.loadGrid()
   },
   created() {
+    // this.getRowId = (params) => params.data.id;
     this.rowSelection = 'multiple';
     this.overlayLoadingTemplate =
       '<span class="ag-overlay-loading-center">Please wait while your rows are loading. This could take a minute to refresh your data.</span>';
@@ -213,7 +218,11 @@ export default {
           labels.push(tag.label)
         }
         this.columnDefs = [
-          // {headerName: "ID", field: "catalogItemId", editable: false},
+          {
+            headerName: "Item ID",
+            field: "id",
+            editable: false
+          },
           {
             headerName: "Title",
             field: "title",
@@ -243,7 +252,11 @@ export default {
             headerName: 'Tags',
             field: 'tags',
             autoHeight: true,
+            editable: false,
             cellRenderer: 'TagSelect',
+            cellRendererParams: {
+              tags_listed: 'irishGreen'
+            },
             width: 300,
           },
         ];
@@ -261,8 +274,7 @@ export default {
             id: this.catalogItems[i].id,
             title: this.catalogItems[i].title,
             description: this.catalogItems[i].description,
-            thumbnail_url: thumbnail_url,
-            tags: 'vvv'
+            thumbnail_url: thumbnail_url
           })
         }
         this.rowData = rows
@@ -301,7 +313,6 @@ export default {
     }
   }
 }
-
 
 
 // {

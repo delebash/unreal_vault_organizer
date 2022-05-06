@@ -27,7 +27,7 @@
             @click="selectedTag(tag)"
             :color=tag.color
           >
-        {{ tag.label }}
+            <div>{{ tag.label }}</div>
       </q-chip>
   </span>
 
@@ -45,7 +45,6 @@
         use-chips
         v-model="tag_color"
         :options="tag_color_options"
-
       >
 
         <template v-slot:option="scope">
@@ -122,13 +121,17 @@ export default {
           keyPath: 'id',
           autoIncrement: true
         });
+        const additional_row_info = db.createObjectStore('additional_row_info', {
+          // The 'id' property of the object will be the key.
+          keyPath: 'catalogItemId'
+        });
       },
     });
     await this.loadData()
   },
   methods: {
     filterGrid(selected_tags) {
-      console.log(selected_tags)
+     // console.log(selected_tags)
     },
     selectedTag(tag) {
       if (tag.selected === true) {

@@ -1,4 +1,5 @@
 import { app, BrowserWindow, nativeTheme, Menu, MenuItem , shell} from 'electron'
+const contextMenu = require('electron-context-menu');
 import path from 'path'
 import os from 'os'
 
@@ -10,6 +11,19 @@ try {
     require('fs').unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'))
   }
 } catch (_) { }
+
+
+contextMenu({
+  showSaveImageAs: true,
+  showLookUpSelection: true,
+  showSearchWithGoogle: true,
+  showCopyImage: true,
+  showSaveImage: true,
+  showSaveLinkAs: true,
+  showInspectElement: true,
+  showCopyImageAddress: true,
+});
+
 
 let mainWindow
 
