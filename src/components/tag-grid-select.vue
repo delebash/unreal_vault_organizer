@@ -26,6 +26,19 @@
       </q-item>
     </template>
 
+    <template v-slot:option="scope">
+      <q-item
+        v-bind="scope.itemProps"
+      >
+        <q-item-section>
+          <q-item-label v-html="scope.opt.label"></q-item-label>
+        </q-item-section>
+        <q-item-section avatar>
+          <q-avatar :color="scope.opt.color"></q-avatar>
+        </q-item-section>
+      </q-item>
+    </template>
+
     <template v-slot:selected-item="scope">
       <q-chip
         removable
