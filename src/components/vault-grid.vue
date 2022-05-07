@@ -30,9 +30,8 @@ import {ref} from 'vue'
 import {openDB} from 'idb';
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
-import {AgGridVue} from "ag-grid-vue3";
-// import {ClientSideRowModelModule} from '@ag-grid-community/client-side-row-model'
-import TagGridSelect from './tag-grid-select.vue'
+
+
 
 let db
 let fetch_options = {
@@ -43,11 +42,7 @@ let fetch_options = {
 
 
 export default {
-  components: {
-    AgGridVue,
-    TagGridSelect
 
-  },
   setup() {
     // Gets called once before editing starts, to give editor a chance to
     // cancel the editing before it even starts.
@@ -87,7 +82,15 @@ export default {
       }
     }
   },
+  async beforeMount() {
+
+  },
   async mounted() {
+    this.eventBus.on('refreshGrid', (args) => {
+      this.refreshGrid(args)
+
+    })
+
     db = await openDB('Unreal-Vault', 1, {
       upgrade(db) {
         // Create a store of objects
@@ -113,6 +116,7 @@ export default {
     this.catalogItems = await db.get('vault', 'vault_catalog') || [];
     this.tag_info_options = await db.getAll('tags') || [];
     //  console.log(this.tag_info_options)
+ //   await db.put('vault', JSON.stringify(this), 'grid_context');
     await this.loadGrid()
   },
   created() {
@@ -121,6 +125,9 @@ export default {
       '<span class="ag-overlay-loading-center">Please wait while your rows are loading. This could take a minute to refresh your data.</span>';
   },
   methods: {
+    refreshGrid(params) {
+      this.gridApi.redrawRows()
+    },
     async getVault() {
 
       this.unreal_token = await db.get('vault', 'unreal_token')
@@ -252,7 +259,7 @@ export default {
             field: 'tags',
             autoHeight: true,
             editable: false,
-            cellRenderer: 'TagGridSelect',
+            cellRenderer: 'tag-grid-select',
             width: 300,
           },
         ];
@@ -278,7 +285,7 @@ export default {
     },
     async getTags(params) {
 
-     // console.log(params)
+      // console.log(params)
       //let id = row.data.id
       //let results =  await db.get('tags', tag_id) || [];
       // console.log(row)

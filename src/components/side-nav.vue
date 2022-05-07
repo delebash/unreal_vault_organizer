@@ -1,6 +1,6 @@
 <template>
   <div id="menu" class="q-pa-xs text-h6 bg-primary text-white">Menu</div>
-  <div id="tag_item" class="q-pa-xs">Filter by tag or add new</div>
+  <div id="tag_item" class="q-pa-xs">Add new tags. Double click to edit.</div>
 
   <div class="col q-pa-md">
     <q-select
@@ -99,9 +99,10 @@ import {ref} from 'vue'
 import {openDB} from "idb";
 
 let db
+let refresh_grid_options = {}
 
 export default {
-  name: 'SideNav',
+
   setup() {
 
     return {
@@ -121,6 +122,7 @@ export default {
     }
   },
   mounted: async function () {
+
     db = await openDB('Unreal-Vault', 1, {
       upgrade(db) {
         // Create a store of objects
@@ -158,6 +160,8 @@ export default {
       }
     },
     async saveTagInfo() {
+      refresh_grid_options.refresh = true
+
       this.tag_clicked.label = this.tag_label
       this.tag_clicked.color = this.tag_color.value
       this.tag_edit = false
@@ -165,11 +169,24 @@ export default {
       await this.saveDb('tags', data, 'PUT')
     },
     async removeTag(tag) {
+      refresh_grid_options.refresh = true
       const index = this.tag_info_options.findIndex(({label}) => label === tag.label);
       let tag_to_delete = JSON.parse(JSON.stringify(tag));
       this.tag_info_options.splice(index, 1)
       this.selected_tags.splice(index, 1)
-      await this.saveDb('tags', tag_to_delete, 'DELETE')
+
+      //Remove tag from all rows
+      let rows = await db.getAll('additional_row_info')
+
+      for (let row of rows) {
+        let tag_ids = row.tag_ids
+        // console.log(tag)
+        if (tag_ids.includes(tag.id)) {
+          console.log(tag.id)
+        }
+      }
+
+      //await this.saveDb('tags', tag_to_delete, 'DELETE')
     },
     displayTag(tag) {
       this.tag_edit = true
@@ -179,6 +196,8 @@ export default {
       this.tag_color.label = tag.color
     },
     createValue(val, done) {
+      refresh_grid_options.refresh = true
+
       // specific logic to eventually call done(...) -- or not
       done(val, 'add-unique')
       if (val.length > 0) {
@@ -194,6 +213,7 @@ export default {
             }
           })
         done(null)
+
         for (let tag of this.new_tags) {
           let data = JSON.parse(JSON.stringify(tag));
           this.saveDb('tags', data, 'ADD')
@@ -204,6 +224,7 @@ export default {
     },
     async saveDb(database, tag, action) {
       let id
+      let params = {}
       if (action === 'ADD') {
         id = await db.add(database, {
           label: tag.label,
@@ -224,6 +245,11 @@ export default {
       } else if (action === 'DELETE') {
         await db.delete(database, tag.id)
       }
+      if (refresh_grid_options.refresh === true) {
+        this.eventBus.emit('refreshGrid', {params})
+      }
+
+
     },
     async loadData() {
       this.tag_info_options = await db.getAll('tags') || [];

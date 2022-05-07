@@ -17,6 +17,7 @@
     "ag-grid-vue3": "^27.2.1",
     "electron-context-menu": "^3.1.2",
     "idb": "^7.0.1",
+    "mitt": "^3.0.0",
     "node-fetch": "^2.6.7",
     "quasar": "^2.6.6",
     "vue": "^3.2.33",

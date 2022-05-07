@@ -63,7 +63,6 @@ import {openDB} from "idb";
 let db
 
 export default {
-  name: "TagGridSelect",
   setup(props) {
     return {
       rowID: props.params.data.id,

@@ -70,17 +70,12 @@
 <script>
 import {openDB} from "idb";
 import {ref} from 'vue'
-import SideNav from '../components/side-nav.vue'
-import VaultGrid from '../components/vault-grid.vue'
 import {useQuasar} from 'quasar'
 
 let db
 
 export default {
-  components: {
-    VaultGrid,
-    SideNav
-  },
+
   setup() {
     const $q = useQuasar()
     return {
