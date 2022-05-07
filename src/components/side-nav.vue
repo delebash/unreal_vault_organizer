@@ -177,16 +177,19 @@ export default {
 
       //Remove tag from all rows
       let rows = await db.getAll('additional_row_info')
-
       for (let row of rows) {
-        let tag_ids = row.tag_ids
-        // console.log(tag)
-        if (tag_ids.includes(tag.id)) {
-          console.log(tag.id)
+        if (row.tag_ids.includes(tag.id)) {
+          const index = row.tag_ids.findIndex(object => {
+            return object === tag.id;
+          });
+          row.tag_ids.splice(index, 1)
+          await this.saveRow('additional_row_info', row)
         }
       }
-
-      //await this.saveDb('tags', tag_to_delete, 'DELETE')
+      await this.saveDb('tags', tag_to_delete, 'DELETE')
+    },
+    async saveRow(database, row) {
+      await db.put(database, row)
     },
     displayTag(tag) {
       this.tag_edit = true
@@ -222,6 +225,7 @@ export default {
         this.new_tags = []
       }
     },
+
     async saveDb(database, tag, action) {
       let id
       let params = {}
