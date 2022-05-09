@@ -2,36 +2,33 @@
   <div id="menu" class="q-pa-xs text-h6 bg-primary text-white">Menu</div>
   <div id="tag_item" class="q-pa-xs">Add new tags. Double click to edit.</div>
 
-  <div class="col q-pa-md">
-    <q-select
-      filled
-      v-model="tags"
-      use-input
-      use-chips
-      multiple
-      hint="Separate multiple values by [,;|]"
-      hide-dropdown-icon
-      input-debounce="0"
-      :options="tag_info_options"
-      @new-value="createValue"
-      style="max-width: 200px"
-    >
+  <q-select
+    filled
+    v-model="tags"
+    use-input
+    use-chips
+    multiple
+    hint="Separate multiple values by [,;|]"
+    hide-dropdown-icon
+    input-debounce="0"
+    @new-value="createValue"
+    style="max-width: 200px"
+  >
 
-      <template v-slot:option="scope">
-        <q-item
-          v-bind="scope.itemProps"
-        >
-          <q-item-section>
-            <q-item-label v-html="scope.opt.label"></q-item-label>
-          </q-item-section>
-          <q-item-section avatar>
-            <q-avatar :color=scope.opt.color></q-avatar>
-          </q-item-section>
-        </q-item>
-      </template>
+    <template v-slot:option="scope">
+      <q-item
+        v-bind="scope.itemProps"
+      >
+        <q-item-section>
+          <q-item-label v-html="scope.opt.label"></q-item-label>
+        </q-item-section>
+        <q-item-section avatar>
+          <q-avatar :color=scope.opt.color></q-avatar>
+        </q-item-section>
+      </q-item>
+    </template>
 
-    </q-select>
-  </div>
+  </q-select>
 
   <span v-for="tag in tag_info_options">
           <q-chip
@@ -96,9 +93,8 @@
 
 <script>
 import {ref} from 'vue'
-import {openDB} from "idb";
+import database from '../database';
 
-let db
 let refresh_grid_options = {}
 
 export default {
@@ -114,37 +110,15 @@ export default {
       tag_edit: ref(false),
       tag_label: ref(''),
       tag_color: ref({}),
-      tag_color_options: [
+      temp_tag_color_options: [],
+      tag_color_options: ref([
         {label: 'amber-5', value: 'amber-5'},
         {label: 'red-11', value: 'red-11'},
         {label: 'grey', value: 'grey'},
-      ],
+      ]),
     }
   },
   mounted: async function () {
-
-    db = await openDB('Unreal-Vault', 1, {
-      upgrade(db) {
-        // Create a store of objects
-        const vault = db.createObjectStore('vault', {
-          // The 'id' property of the object will be the key.
-          //  keyPath: 'catalogItemId'
-        });
-        const vault_user_data = db.createObjectStore('vault_user_data', {
-          // The 'id' property of the object will be the key.
-          //  keyPath: 'catalogItemId'
-        });
-        const tags = db.createObjectStore('tags', {
-          // The 'id' property of the object will be the key.
-          keyPath: 'id',
-          autoIncrement: true
-        });
-        const additional_row_info = db.createObjectStore('additional_row_info', {
-          // The 'id' property of the object will be the key.
-          keyPath: 'catalogItemId'
-        });
-      },
-    });
     await this.loadData()
   },
   methods: {
@@ -160,45 +134,37 @@ export default {
       }
     },
     async saveTagInfo() {
+      console.log(this.tag_color)
       refresh_grid_options.refresh = true
-
       this.tag_clicked.label = this.tag_label
       this.tag_clicked.color = this.tag_color.value
       this.tag_edit = false
-      let data = JSON.parse(JSON.stringify(this.tag_clicked));
-      await this.saveDb('tags', data, 'PUT')
+
+      let data = {
+        id: this.tag_clicked.id,
+        label: this.tag_clicked.label,
+        value: this.tag_clicked.value,
+        color: this.tag_clicked.color
+      }
+      await database.putRow('tags', data)
     },
     async removeTag(tag) {
       refresh_grid_options.refresh = true
       const index = this.tag_info_options.findIndex(({label}) => label === tag.label);
-      let tag_to_delete = JSON.parse(JSON.stringify(tag));
       this.tag_info_options.splice(index, 1)
       this.selected_tags.splice(index, 1)
+      await database.deleteRow('tags', tag.id)
+    },
 
-      //Remove tag from all rows
-      let rows = await db.getAll('additional_row_info')
-      for (let row of rows) {
-        if (row.tag_ids.includes(tag.id)) {
-          const index = row.tag_ids.findIndex(object => {
-            return object === tag.id;
-          });
-          row.tag_ids.splice(index, 1)
-          await this.saveRow('additional_row_info', row)
-        }
-      }
-      await this.saveDb('tags', tag_to_delete, 'DELETE')
-    },
-    async saveRow(database, row) {
-      await db.put(database, row)
-    },
     displayTag(tag) {
+     this.tag_color={}
       this.tag_edit = true
       this.tag_clicked = tag
       this.tag_label = tag.label
       this.tag_color.value = tag.color
       this.tag_color.label = tag.color
     },
-    createValue(val, done) {
+    async createValue(val, done) {
       refresh_grid_options.refresh = true
 
       // specific logic to eventually call done(...) -- or not
@@ -218,45 +184,21 @@ export default {
         done(null)
 
         for (let tag of this.new_tags) {
-          let data = JSON.parse(JSON.stringify(tag));
-          this.saveDb('tags', data, 'ADD')
+          let data = {
+            label: tag.label,
+            value: tag.value,
+            color: tag.color
+          }
+          let id = await database.addRow('tags', data)
+          tag.id = id
+          this.tag_info_options.push(tag)
         }
         this.tags = []
         this.new_tags = []
       }
     },
-
-    async saveDb(database, tag, action) {
-      let id
-      let params = {}
-      if (action === 'ADD') {
-        id = await db.add(database, {
-          label: tag.label,
-          value: tag.value,
-          color: tag.color,
-          selected: false
-        })
-        tag.id = id
-        this.tag_info_options.push(tag)
-      } else if (action === 'PUT') {
-        await db.put(database, {
-          label: tag.label,
-          value: tag.value,
-          color: tag.color,
-          id: tag.id,
-          selected: false
-        })
-      } else if (action === 'DELETE') {
-        await db.delete(database, tag.id)
-      }
-      if (refresh_grid_options.refresh === true) {
-        this.eventBus.emit('refreshGrid', {params})
-      }
-
-
-    },
     async loadData() {
-      this.tag_info_options = await db.getAll('tags') || [];
+      this.tag_info_options = await database.getRows('tags') || []
     }
   }
 }

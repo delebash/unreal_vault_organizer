@@ -57,10 +57,8 @@
 </template>
 
 <script>
-import {ref} from 'vue'
-import {openDB} from "idb";
 
-let db
+import {ref} from 'vue'
 
 export default {
   setup(props) {
@@ -73,29 +71,7 @@ export default {
   },
   mounted: async function () {
 
-    db = await openDB('Unreal-Vault', 1, {
-      upgrade(db) {
-        // Create a store of objects
-        const vault = db.createObjectStore('vault', {
-          // The 'id' property of the object will be the key.
 
-        });
-        const vault_user_data = db.createObjectStore('vault_user_data', {
-          // The 'id' property of the object will be the key.
-
-        });
-        const tags = db.createObjectStore('tags', {
-          // The 'id' property of the object will be the key.
-          keyPath: 'id',
-          autoIncrement: true
-        });
-        const additional_row_info = db.createObjectStore('additional_row_info', {
-          // The 'id' property of the object will be the key.
-          keyPath: 'catalogItemId'
-
-        });
-      },
-    });
     await this.loadData()
   },
   methods: {
@@ -104,31 +80,36 @@ export default {
     },
     async saveTagDb(database, tags, action) {
       let rowId = this.params.data.id
+      let comment = this.params.data.comment
       let arrTags = []
       for (let tag of tags) {
         arrTags.push(tag.id)
       }
 
-      await db.put(database, {
-        tag_ids: arrTags,
-        catalogItemId: rowId
-      })
+      // await db.put(database, {
+      //   tag_ids: arrTags,
+      //   comment: comment,
+      //   catalogItemId: rowId
+      // })
     },
     selectedTag(e) {
       // console.log(this.params)
     },
     async loadData() {
-      let tag
-      let rowTags = await db.get('additional_row_info', this.rowID)
-      if (rowTags !== undefined) {
-        for(let tag_id of rowTags.tag_ids){
-          tag = await db.get('tags', tag_id)
-         // console.log(tag)
-         this.tags.push(tag)
-        }
-      }
-      this.tag_info_options = await db.getAll('tags') || '';
-
+   //    let tag
+   // //   let row = await db.get('additional_row_info', this.rowID) || null
+   //    if (row !== null) {
+   //      if(row.tag_ids) {
+   //        for (let tag_id of row.tag_ids) {
+   //          //tag = await db.get('tags', tag_id)
+   //          this.tags.push(tag)
+   //        }
+   //      }
+   //      if(row.comment){
+   //        this.eventBus.emit('updateRow', {rowID: this.rowID, comment: row.comment})
+   //      }
+   //    }
+   //    this.tag_info_options = await db.getAll('tags') || '';
     }
   }
 }

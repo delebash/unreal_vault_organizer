@@ -12,12 +12,12 @@
       :defaultColDef="defaultColDef"
       :rowData="rowData"
       :getRowNodeId="getRowNodeId"
+      :valueCache="true"
       :rowSelection="rowSelection"
       :overlayLoadingTemplate="overlayLoadingTemplate"
       @cell-value-changed="onCellValueChanged"
       @selection-changed="onSelectionChanged"
       @first-data-rendered="onFirstDataRendered">
-
     </ag-grid-vue>
   </div>
 </template>
@@ -27,13 +27,10 @@
 <script>
 
 import {ref} from 'vue'
-import {openDB} from 'idb';
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+import database from '../database';
 
-
-
-let db
 let fetch_options = {
   method: '',
   headers: {},
@@ -42,8 +39,8 @@ let fetch_options = {
 
 
 export default {
-
   setup() {
+
     // Gets called once before editing starts, to give editor a chance to
     // cancel the editing before it even starts.
     const isCancelBeforeStart = () => {
@@ -82,96 +79,121 @@ export default {
       }
     }
   },
-  async beforeMount() {
 
-  },
   async mounted() {
     this.eventBus.on('refreshGrid', (args) => {
       this.refreshGrid(args)
-
+    })
+    this.eventBus.on('updateRow', (args) => {
+      this.updateRow(args)
     })
 
-    db = await openDB('Unreal-Vault', 1, {
-      upgrade(db) {
-        // Create a store of objects
-        const vault = db.createObjectStore('vault', {
-          // The 'id' property of the object will be the key.
-          //  keyPath: 'catalogItemId'
-        });
-        const vault_user_data = db.createObjectStore('vault_user_data', {
-          // The 'id' property of the object will be the key.
-          //  keyPath: 'catalogItemId'
-        });
-        const tags = db.createObjectStore('tags', {
-          // The 'id' property of the object will be the key.
-          keyPath: 'id',
-          autoIncrement: true
-        });
-        const additional_row_info = db.createObjectStore('additional_row_info', {
-          // The 'id' property of the object will be the key.
-          keyPath: 'catalogItemId'
-        });
+    this.columnDefs = [
+      {
+        headerName: "Catalog Item Id",
+        field: "catalogItemId",
+        editable: false,
+        hide: true
       },
-    });
-    this.catalogItems = await db.get('vault', 'vault_catalog') || [];
-    this.tag_info_options = await db.getAll('tags') || [];
-    //  console.log(this.tag_info_options)
- //   await db.put('vault', JSON.stringify(this), 'grid_context');
+      {
+        headerName: "Title",
+        field: "title",
+        editable: false,
+        wrapText: true,
+        width: 300,
+        cellRenderer: function (params) {
+          let title = params.data.title;
+          let myTitle = `<div>${title}</div>`;
+          return myTitle;
+        }
+      },
+      {
+        headerName: "Image",
+        editable: false,
+        width: 100,
+        field: "thumbnail",
+        cellRenderer: function (params) {
+          let thumbnail_url = params.data.thumbnail_url;
+          let Marketplace_url = "https://www.unrealengine.com/marketplace/en-US/item/" + params.data.id;
+          let launcher_url = "com.epicgames.launcher://ue/marketplace/item/" + params.data.id;
+          let img = `<a href=${launcher_url} target="_blank"><img  width="100" height="100" src= ${thumbnail_url}>`;
+          return img;
+        }
+      },
+      // {
+      //   headerName: 'Tags',
+      //   field: 'tags',
+      //   autoHeight: true,
+      //   editable: false,
+      //   cellRenderer: 'tag-grid-select',
+      //   width: 270,
+      // },
+      // {
+      //   headerName: "Comments",
+      //   field: "comment",
+      //   wrapText: true,
+      //   width: 300,
+      //   cellEditor: 'agLargeTextCellEditor'
+      // }
+    ];
     await this.loadGrid()
   },
   created() {
+
     this.rowSelection = 'multiple';
     this.overlayLoadingTemplate =
       '<span class="ag-overlay-loading-center">Please wait while your rows are loading. This could take a minute to refresh your data.</span>';
   },
   methods: {
+    updateRow(args) {
+      let rowNode = this.gridApi.getRowNode(args.rowID);
+      rowNode.setDataValue('comment', args.comment);
+    },
     refreshGrid(params) {
       this.gridApi.redrawRows()
     },
+
+    async loadGrid() {
+      this.rowData = await database.getRows('vault_library') || []
+    //  console.log(this.rowData)
+      // this.tag_info_options = await db.getAll('tags') || [];
+      // if (this.catalogItems.length > 0) {
+      //   let rows = []
+      //   let labels = []
+      //   for (let tag of this.tag_info_options) {
+      //     labels.push(tag.label)
+      //   }
+    },
     async getVault() {
+      let row = await database.getRow('user_settings')
+      if (row) {
+        this.unreal_token = row.unreal_token
+        this.account_number = row.account_number
 
-      this.unreal_token = await db.get('vault', 'unreal_token')
-      this.account_number = await db.get('vault', 'account_number')
+        let catalog_url = 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/ue/bulk/items?includeDLCDetails=false&includeMainGameDetails=false&country=US&locale=en'
+        let entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/' + this.account_number + '/entitlements'
+        let count_params1 = '?start=0&count=2000'
+        let count_params2 = '?start=1000&count=1000'
+        //Get list of entitlements for catalog query
+        fetch_options.method = 'GET'
+        fetch_options.headers = {
+          'Authorization': this.unreal_token,
+          'Content-Type': 'application/json'
+        }
+        let entitlements
+        entitlements = await window.myNodeApi.api_fetch(entitlement_url + count_params1, fetch_options)
 
-      let catalog_url = 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/ue/bulk/items?includeDLCDetails=false&includeMainGameDetails=false&country=US&locale=en'
-      let entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/' + this.account_number + '/entitlements'
-      let count_params1 = '?start=0&count=1000'
-      let count_params2 = '?start=1000&count=1000'
-      //Get list of entitlements for catalog query
-      fetch_options.method = 'GET'
-      fetch_options.headers = {
-        'Authorization': this.unreal_token,
-        'Content-Type': 'application/json'
+        await this.getCatalogItems(catalog_url, entitlements)
+        await this.loadGrid();
       }
-
-
-      let entitlements
-      entitlements = await window.myNodeApi.api_fetch(entitlement_url + count_params1, fetch_options)
-
-      await this.getCatalogItems(catalog_url, entitlements)
-      this.catalogItems = await db.get('vault', 'vault_catalog');
-      await this.loadGrid();
-      //
-      // fetch_options.method = 'GET'
-      // fetch_options.headers = {
-      //   Authorization: this.unreal_token,
-      //   ['Content-Type']: 'application/json',
-      // }
-      //
-      // entitlements = await window.myNodeApi.api_fetch(entitlement_url + count_params2, fetch_options)
-
-      // await this.getCatalogItems(catalog_url,entitlements)
-
     },
     async getCatalogItems(catalog_url, entitlements) {
-
       fetch_options.method = 'POST'
       fetch_options.headers = {
         'Authorization': this.unreal_token,
         'Content-Type': 'application/x-www-form-urlencoded'
       }
 
-      let arrCatalog = [];
       let start = 0;
       let entitlements_length = entitlements.length || [];
       let response;
@@ -183,14 +205,25 @@ export default {
         form_body = form_body + 'id=' + catalog_Itemid + '&'
         start = start + 1
       }
-      //post data
+
+      let data
       fetch_options.body = form_body.slice(0, -1);
       response = await window.myNodeApi.api_fetch(catalog_url, fetch_options)
+      let count = 0
+      for (let catalog_item of Object.values(response)) {
+        count = count + 1
+        data = {}
+        data.catalogItemId = catalog_item.id
+        data.description = catalog_item.description
+        data.title = catalog_item.title
 
-      for (val of Object.values(response)) {
-        arrCatalog.push(val)
+        for (let keyImage of catalog_item.keyImages) {
+          if (keyImage.type === 'Thumbnail') {
+            data.thumbnail_url = keyImage.url
+          }
+        }
+        await database.putRow('vault_library', data)
       }
-      await db.put('vault', arrCatalog, 'vault_catalog');
     },
 
     onSelectionChanged() {
@@ -200,8 +233,6 @@ export default {
         that.selectedRowId = selectedRow.catalogItemId;
       })
     },
-
-
     // async setData() {
     //   let meta = {}
     //   meta.comment = "hhhh"
@@ -209,6 +240,7 @@ export default {
     //   let rowNode = this.gridApi.getRowNode(this.selectedRowId);
     //   rowNode.setDataValue('comment', meta.comment);
     // },
+
     async onGridReady(params) {
       this.gridApi = params.api;
       this.gridColumnApi = params.columnApi;
@@ -216,128 +248,61 @@ export default {
     onFirstDataRendered(params) {
       // params.api.sizeColumnsToFit();
     },
-    async loadGrid() {
-      if (this.catalogItems.length > 0) {
-        let rows = []
-        let labels = []
-        for (let tag of this.tag_info_options) {
-          labels.push(tag.label)
-        }
-        this.columnDefs = [
-          {
-            headerName: "Item ID",
-            field: "id",
-            editable: false
-          },
-          {
-            headerName: "Title",
-            field: "title",
-            editable: false,
-            wrapText: true,
-            width: 300,
-            cellRenderer: function (params) {
-              let title = params.data.title;
-              let myTitle = `<div>${title}</div>`;
-              return myTitle;
-            }
-          },
-          {
-            headerName: "Image",
-            editable: false,
-            width: 94,
-            field: "thumbnail",
-            cellRenderer: function (params) {
-              let thumbnail_url = params.data.thumbnail_url;
-              let Marketplace_url = "https://www.unrealengine.com/marketplace/en-US/item/" + params.data.id;
-              let launcher_url = "com.epicgames.launcher://ue/marketplace/item/" + params.data.id;
-              let img = `<a href=${launcher_url} target="_blank"><img  width="50" height="50" src= ${thumbnail_url}>`;
-              return img;
-            }
-          },
-          {
-            headerName: 'Tags',
-            field: 'tags',
-            autoHeight: true,
-            editable: false,
-            cellRenderer: 'tag-grid-select',
-            width: 300,
-          },
-        ];
 
-        let thumbnail_url
-
-        for (let i = 0; i < this.catalogItems.length; i++) {
-          for (let image of this.catalogItems[i].keyImages) {
-            if (image.type === 'Thumbnail') {
-              thumbnail_url = image.url
-              break
-            }
-          }
-          rows.push({
-            id: this.catalogItems[i].id,
-            title: this.catalogItems[i].title,
-            description: this.catalogItems[i].description,
-            thumbnail_url: thumbnail_url
-          })
-        }
-        this.rowData = rows
-      }
+    cellChanged() {
+      console.log('test')
     },
-    async getTags(params) {
-
-      // console.log(params)
-      //let id = row.data.id
-      //let results =  await db.get('tags', tag_id) || [];
-      // console.log(row)
+    async test(params) {
+      // let value = await db.get('additional_row_info', params.data.id) || ''
+      //console.log('test')
+      let rowNode = params.node
+      // rowNode.setDataValue('comment', 'comment');
       return 'test'
     },
     async saveData(data) {
-      let meta = {
-        comment: ''
-      }
-      for (let i = 0; i < data.length; i++) {
-        let catalogItem = data[i]
-        let catalogItemId = data[i].catalogItemId
-        await db.put('vault', catalogItem, catalogItemId);
-        let rowExists = await db.get('vault', catalogItemId);
-        if (rowExists == null) {
-          await db.put('vault', meta, catalogItemId);
-        }
-      }
-    },
-    extractValues(mappings) {
-      // let arrLabel = []
-      // for (let tag of tags) {
-      //   arrLabel.push(tag.label)
+      // let meta = {
+      //   comment: ''
       // }
-      // return arrLabel
-      return Object.keys(mappings);
+      // for (let i = 0; i < data.length; i++) {
+      //   let catalogItem = data[i]
+      //   let catalogItemId = data[i].catalogItemId
+      //   await db.put('vault', catalogItem, catalogItemId);
+      //   let rowExists = await db.get('vault', catalogItemId);
+      //   if (rowExists == null) {
+      //     await db.put('vault', meta, catalogItemId);
+      //   }
+      // }
     },
+
     onCellValueChanged(event) {
-      //let catalogItemId = event.data.catalogItemId
-      // let meta = {}
-      // let comment = event.data.comment
-      // meta.comment = comment
-      // // let anotherfield = event.data.anotherfield
-      // // meta.anotherfield = anotherfield
-      // db.put('vault', meta, catalogItemId);
+      //
+      //  let catalogItemId = event.data.id
+      //  let data = {}
+      //  data.comment = event.data.comment
+      //  data.catalogItemId = catalogItemId
+      //  // console.log(catalogItemId)
+      // //db.put('additional_row_info', data);
+      //  db.put('additional_row_info', data, catalogItemId);
     }
   }
 }
 
 
-// {
-//   headerName: "Comment",
-//   field: "comment",
-//   wrapText: true,
-//   cellEditor: 'agLargeTextCellEditor',
-//   valueSetter: (params) => {
-//     let newVal = params.newValue;
-//     let valueChanged = params.data.comment !== newVal;
-//     if (valueChanged) {
-//       params.data.comment = newVal;
-//     }
-//     return valueChanged;
-//   },
+//   console.log(params)
+//   let rowNode = params.node
+//  // rowNode.setDataValue('comment', 'test');
+//   this.test(params).then(function (data) {
+//     // console.log('test')
+//
+//    // console.log(params.node)
+//  //   let rowNode = params.node
+//    // rowNode.setDataValue('comment', 'test');
+//     // params.api.refreshCells({
+//     //   rowNodes: [params.node],
+//     //   columns: [params.column]
+//     // });
+//   });
+//   return false
 // }
+
 </script>
