@@ -1,7 +1,7 @@
 <template>
   <div id="app">
 
-    <q-btn class="q-pt-none" dense @click="getVault()" color="primary"
+    <q-btn class="q-pt-none" dense @click="getVaultRows" color="primary"
            label="Get Vault Items"></q-btn>
     <ag-grid-vue
       style="width: 100%; height: 73%;"
@@ -30,13 +30,15 @@ import {ref} from 'vue'
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import database from '../database';
+import {db} from '../db';
+import {useObservable} from "@vueuse/rxjs";
+import {liveQuery} from "dexie";
 
 let fetch_options = {
   method: '',
   headers: {},
   body: {}
 }
-
 
 export default {
   setup() {
@@ -56,10 +58,10 @@ export default {
     return {
       isCancelAfterEnd,
       isCancelBeforeStart,
+      additional_row_info: [],
       modules: [],
       columnDefs: ref([]),
       tag_info_options: ref([]),
-      catalogItems: [],
       gridApi: null,
       gridColumnApi: null,
       rowData: ref([]),
@@ -120,21 +122,21 @@ export default {
           return img;
         }
       },
-      // {
-      //   headerName: 'Tags',
-      //   field: 'tags',
-      //   autoHeight: true,
-      //   editable: false,
-      //   cellRenderer: 'tag-grid-select',
-      //   width: 270,
-      // },
-      // {
-      //   headerName: "Comments",
-      //   field: "comment",
-      //   wrapText: true,
-      //   width: 300,
-      //   cellEditor: 'agLargeTextCellEditor'
-      // }
+      {
+        headerName: 'Tags',
+        field: 'tags',
+        autoHeight: true,
+        editable: false,
+        cellRenderer: 'tag-grid-select',
+        width: 270,
+      },
+      {
+        headerName: "Comment",
+        field: "comment",
+        wrapText: true,
+        width: 300,
+        cellEditor: 'agLargeTextCellEditor'
+      }
     ];
     await this.loadGrid()
   },
@@ -153,52 +155,34 @@ export default {
       this.gridApi.redrawRows()
     },
 
-    async loadGrid() {
-      this.rowData = await database.getRows('vault_library') || []
-    //  console.log(this.rowData)
-      // this.tag_info_options = await db.getAll('tags') || [];
-      // if (this.catalogItems.length > 0) {
-      //   let rows = []
-      //   let labels = []
-      //   for (let tag of this.tag_info_options) {
-      //     labels.push(tag.label)
-      //   }
-    },
-    async getVault() {
-      let row = await database.getRow('user_settings')
-      if (row) {
-        this.unreal_token = row.unreal_token
-        this.account_number = row.account_number
+    async getVaultRows() {
+      let user_settings = await db.user_settings.toCollection().first();
+      this.unreal_token = user_settings.unreal_token
+      this.account_number = user_settings.account_number
 
-        let catalog_url = 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/ue/bulk/items?includeDLCDetails=false&includeMainGameDetails=false&country=US&locale=en'
-        let entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/' + this.account_number + '/entitlements'
-        let count_params1 = '?start=0&count=2000'
-        let count_params2 = '?start=1000&count=1000'
-        //Get list of entitlements for catalog query
-        fetch_options.method = 'GET'
-        fetch_options.headers = {
-          'Authorization': this.unreal_token,
-          'Content-Type': 'application/json'
-        }
-        let entitlements
-        entitlements = await window.myNodeApi.api_fetch(entitlement_url + count_params1, fetch_options)
-
-        await this.getCatalogItems(catalog_url, entitlements)
-        await this.loadGrid();
+      let catalog_url = 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/ue/bulk/items?includeDLCDetails=false&includeMainGameDetails=false&country=US&locale=en'
+      let entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/' + this.account_number + '/entitlements'
+      let count_params1 = '?start=0&count=2000'
+      // let count_params2 = '?start=1000&count=1000'
+      //Get list of entitlements for catalog query
+      fetch_options.method = 'GET'
+      fetch_options.headers = {
+        'Authorization': this.unreal_token,
+        'Content-Type': 'application/json'
       }
+      let entitlements
+      entitlements = await window.myNodeApi.api_fetch(entitlement_url + count_params1, fetch_options)
+      await this.getCatalogItems(catalog_url, entitlements)
     },
     async getCatalogItems(catalog_url, entitlements) {
+      let start = 0, entitlements_length = entitlements.length || [], response, form_body = '',
+        thumbnail_url = ''
+
       fetch_options.method = 'POST'
       fetch_options.headers = {
         'Authorization': this.unreal_token,
         'Content-Type': 'application/x-www-form-urlencoded'
       }
-
-      let start = 0;
-      let entitlements_length = entitlements.length || [];
-      let response;
-      let form_body = ''
-      let val;
 
       while (start <= entitlements_length - 1) {
         let catalog_Itemid = entitlements[start].catalogItemId
@@ -206,26 +190,72 @@ export default {
         start = start + 1
       }
 
-      let data
       fetch_options.body = form_body.slice(0, -1);
       response = await window.myNodeApi.api_fetch(catalog_url, fetch_options)
-      let count = 0
       for (let catalog_item of Object.values(response)) {
-        count = count + 1
-        data = {}
-        data.catalogItemId = catalog_item.id
-        data.description = catalog_item.description
-        data.title = catalog_item.title
-
+        thumbnail_url = ''
         for (let keyImage of catalog_item.keyImages) {
           if (keyImage.type === 'Thumbnail') {
-            data.thumbnail_url = keyImage.url
+            thumbnail_url = keyImage.url
+            break;
           }
         }
-        await database.putRow('vault_library', data)
-      }
-    },
+        const catalog_row = await db.vault_library.where('catalogItemId').equals(catalog_item.id).first()
 
+        if (catalog_row === undefined) {
+          console.log('put')
+          await db.vault_library.add({
+            catalogItemId: catalog_item.id,
+            description: catalog_item.description,
+            title: catalog_item.title,
+            thumbnail_url: thumbnail_url
+          })
+        } else {
+          console.log('update')
+          await db.vault_library.update(catalog_item.id, {
+            description: catalog_item.description,
+            title: catalog_item.title,
+            thumbnail_url: thumbnail_url
+          })
+        }
+        // if (catalog_row.catalogItemId) {
+        //   console.log(catalog_row)
+        //
+        // } else {
+        //   console.log('add')
+        //   console.log(catalog_row)
+        //
+        // }
+      }
+      // await this.loadGrid();
+    },
+    async loadGrid() {
+
+      let catalogItems = await db.vault_library.toArray()
+      this.rowData = await Promise.all(catalogItems.map(async catalogItem => {
+        catalogItem.tags = await db.tags.where('id').anyOf([1]).toArray()
+        return catalogItem
+      }));
+
+
+      // console.log(JSON.stringify(this.catalogItems))
+//console.log(this.catalogItems)
+      //     this.rowData = this.catalogItems
+
+      //   let results =  await this.getJoin()
+      //  console.log(results)
+      // this.additional_row_info = await database.getRows('additional_row_info') || []
+
+      // // //  console.log(this.rowData)
+      // this.tag_info_options = await database.getRows('tags') || [];
+      // if (this.catalogItems.length > 0) {
+      //   let rows = []
+      //   let labels = []
+      //   for (let tag of this.tag_info_options) {
+      //     labels.push(tag.label)
+      //   }
+      // }
+    },
     onSelectionChanged() {
       let that = this
       let selectedRows = this.gridApi.getSelectedRows();
@@ -233,14 +263,6 @@ export default {
         that.selectedRowId = selectedRow.catalogItemId;
       })
     },
-    // async setData() {
-    //   let meta = {}
-    //   meta.comment = "hhhh"
-    //   await db.put('vault', meta, this.selectedRowId);
-    //   let rowNode = this.gridApi.getRowNode(this.selectedRowId);
-    //   rowNode.setDataValue('comment', meta.comment);
-    // },
-
     async onGridReady(params) {
       this.gridApi = params.api;
       this.gridColumnApi = params.columnApi;
@@ -248,44 +270,34 @@ export default {
     onFirstDataRendered(params) {
       // params.api.sizeColumnsToFit();
     },
-
-    cellChanged() {
-      console.log('test')
+    getComment() {
+      //return 'test'
     },
-    async test(params) {
-      // let value = await db.get('additional_row_info', params.data.id) || ''
-      //console.log('test')
-      let rowNode = params.node
-      // rowNode.setDataValue('comment', 'comment');
-      return 'test'
-    },
-    async saveData(data) {
-      // let meta = {
-      //   comment: ''
-      // }
-      // for (let i = 0; i < data.length; i++) {
-      //   let catalogItem = data[i]
-      //   let catalogItemId = data[i].catalogItemId
-      //   await db.put('vault', catalogItem, catalogItemId);
-      //   let rowExists = await db.get('vault', catalogItemId);
-      //   if (rowExists == null) {
-      //     await db.put('vault', meta, catalogItemId);
-      //   }
-      // }
-    },
-
-    onCellValueChanged(event) {
-      //
-      //  let catalogItemId = event.data.id
-      //  let data = {}
-      //  data.comment = event.data.comment
-      //  data.catalogItemId = catalogItemId
-      //  // console.log(catalogItemId)
-      // //db.put('additional_row_info', data);
-      //  db.put('additional_row_info', data, catalogItemId);
+    async onCellValueChanged(event) {
+      await db.vault_library.update(event.data.catalogItemId, {
+        comment: event.data.comment
+      })
     }
   }
 }
+
+
+// let catalogItemId = event.data.catalogItemId
+// console.log(catalogItemId)
+// let description = event.data.description
+// let title = event.data.title
+// let thumbnail_url = event.data.thumbnail_url
+// let comment = event.data.comment
+// let tagIds = event.data.tagIds
+//
+// await db.vault_library.put({
+//   catalogItemId: catalogItemId,
+//   description: description,
+//   title: title,
+//   thumbnail_url: thumbnail_url,
+//   comment: comment,
+//   tagIds: tagIds
+// })
 
 
 //   console.log(params)
@@ -305,4 +317,19 @@ export default {
 //   return false
 // }
 
+//async test(params) {
+// let value = await db.get('additional_row_info', params.data.id) || ''
+//console.log('test')
+//  let rowNode = params.node
+// rowNode.setDataValue('comment', 'comment');
+//  return 'test'
+// }
+
+// async setData() {
+//   let meta = {}
+//   meta.comment = "hhhh"
+//   await db.put('vault', meta, this.selectedRowId);
+//   let rowNode = this.gridApi.getRowNode(this.selectedRowId);
+//   rowNode.setDataValue('comment', meta.comment);
+// },
 </script>

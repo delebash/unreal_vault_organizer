@@ -20,6 +20,9 @@ let database = {
       return null
     }
   },
+  getRowById: async function(database){
+
+  },
   getRow: async function (database) {
     let row = await db[database]
       .toArray()

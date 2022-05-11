@@ -49,7 +49,16 @@
                     />
                   </template>
                 </q-input>
-
+                <q-input dense v-model="launcher_path" label="Uneral Launcher Path*" stack-label
+                         lazy-rules
+                         :rules="[ val => val && val.length > 0 || 'Please type something']"
+                >
+                </q-input>
+                <q-input dense v-model="sniffer_path" label="Sniffer Path*" stack-label
+                         lazy-rules
+                         :rules="[ val => val && val.length > 0 || 'Please type something']"
+                >
+                </q-input>
                 <q-btn class="q-pt-none" dense @click="getToken()" color="primary"
                        label="GetToken"></q-btn>
 
@@ -71,7 +80,8 @@
 import {ref} from 'vue'
 import {useQuasar} from 'quasar'
 import database from '../database';
-import SideNav from "components/side-nav.vue";
+import SideNav from 'components/side-nav.vue';
+import {db} from '../db'
 
 let refresh_grid_options = {}
 
@@ -92,6 +102,8 @@ export default {
       add_tag: ref([]),
       new_tags: ref([]),
       temp_color_options: [],
+      launcher_path: ref(''),
+      sniffer_path: ref(''),
       tag_color_options: [
         {label: 'amber-5', value: 'amber-5'},
         {label: 'red-11', value: 'red-11'},
@@ -108,13 +120,6 @@ export default {
     await this.loadData()
   },
   methods: {
-    updateTag() {
-      this.tag_clicked.color = this.tag_color.value
-      this.tag_clicked.label = this.tag_label
-      this.tag_clicked.value = this.tag_label
-
-    },
-
     //Begin Side Bar Methods
     filterGrid(selected_tags) {
       // console.log(selected_tags)
@@ -187,9 +192,9 @@ export default {
     //End Nav Bar Methods
 
     async getToken() {
-      let snifferPath = 'Fiddler.exe'
-      let launchaerPath = 'F:\\Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe'
-      let data = await window.myNodeApi.launchSniffer(snifferPath, launchaerPath)
+     // let snifferPath = 'Fiddler.exe'
+     // let launcherPath = 'F:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win64\EpicGamesLauncher.exe'
+      let data = await window.myNodeApi.launchSniffer(this.sniffer_path,this.launcher_path)
 
       const dataArray = data.split(",");
       this.unreal_token = dataArray[0].toString()
@@ -197,25 +202,23 @@ export default {
       let tmpStr = url.match("v1/(.*)/s");
       this.account_number = tmpStr[1];
 
-      let row = {
-        account_number: this.account_number,
-        unreal_token: this.unreal_token
-      }
-      await database.putRow('user_settings', row)
+      await this.saveUserSettings()
     },
     async saveUserSettings() {
-      let data = {
+      await db.user_settings.put({
         account_number: this.account_number,
-        unreal_token: this.unreal_token
-      }
-      await database.putRow('user_settings', data)
+        unreal_token: this.unreal_token,
+        sniffer_path: this.sniffer_path,
+        launcher_path: this.launcher_path,
+      })
     },
     async loadData() {
-
-      let user_settings = await database.getRow('user_settings')
+      let user_settings = await db.user_settings.toCollection().first();
       if (user_settings !== null) {
         this.unreal_token = user_settings.unreal_token
         this.account_number = user_settings.account_number
+        this.launcher_path = user_settings.launcher_path
+        this.sniffer_path = user_settings.sniffer_path
       }
     }
   }

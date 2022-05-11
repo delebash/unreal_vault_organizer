@@ -59,6 +59,8 @@
 <script>
 
 import {ref} from 'vue'
+import database from "src/database";
+import {db} from "src/db";
 
 export default {
   setup(props) {
@@ -70,46 +72,43 @@ export default {
     }
   },
   mounted: async function () {
-
-
     await this.loadData()
   },
   methods: {
-    async updateTags(tag) {
-      await this.saveTagDb('additional_row_info', this.tags, "PUT")
-    },
-    async saveTagDb(database, tags, action) {
-      let rowId = this.params.data.id
-      let comment = this.params.data.comment
+    async updateTags(tags) {
       let arrTags = []
       for (let tag of tags) {
         arrTags.push(tag.id)
       }
 
-      // await db.put(database, {
-      //   tag_ids: arrTags,
-      //   comment: comment,
-      //   catalogItemId: rowId
-      // })
+      await db.vault_library.update(this.params.data.catalogItemId,{
+        tagIds: arrTags
+      })
+
     },
     selectedTag(e) {
       // console.log(this.params)
     },
     async loadData() {
-   //    let tag
-   // //   let row = await db.get('additional_row_info', this.rowID) || null
-   //    if (row !== null) {
-   //      if(row.tag_ids) {
-   //        for (let tag_id of row.tag_ids) {
-   //          //tag = await db.get('tags', tag_id)
-   //          this.tags.push(tag)
-   //        }
-   //      }
-   //      if(row.comment){
-   //        this.eventBus.emit('updateRow', {rowID: this.rowID, comment: row.comment})
-   //      }
-   //    }
-   //    this.tag_info_options = await db.getAll('tags') || '';
+      let tag
+
+
+      // if (row !== null) {
+      //   if (row.tags) {
+      //     for (let tag_id of row.tags) {
+      //       console.log(tag_id)
+      //       tag = await database.getRow('tags', tag_id)
+      //
+      //    //   this.tags.push(tag)
+      //     }
+      //   }
+      // }
+      //console.log(this.tags)
+      // if (row.comment) {
+      //   this.eventBus.emit('updateRow', {rowID: this.rowID, comment: row.comment})
+      // }
+      this.tag_info_options = await db.tags.toArray()
+     this.tags = await db.tags.where('id').anyOf(this.params.data.tagIds).toArray() || []
     }
   }
 }
