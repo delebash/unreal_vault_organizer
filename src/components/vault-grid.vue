@@ -203,7 +203,6 @@ export default {
         const catalog_row = await db.vault_library.where('catalogItemId').equals(catalog_item.id).first()
 
         if (catalog_row === undefined) {
-          console.log('put')
           await db.vault_library.add({
             catalogItemId: catalog_item.id,
             description: catalog_item.description,
@@ -211,23 +210,14 @@ export default {
             thumbnail_url: thumbnail_url
           })
         } else {
-          console.log('update')
           await db.vault_library.update(catalog_item.id, {
             description: catalog_item.description,
             title: catalog_item.title,
             thumbnail_url: thumbnail_url
           })
         }
-        // if (catalog_row.catalogItemId) {
-        //   console.log(catalog_row)
-        //
-        // } else {
-        //   console.log('add')
-        //   console.log(catalog_row)
-        //
-        // }
       }
-      // await this.loadGrid();
+      await this.loadGrid();
     },
     async loadGrid() {
 
