@@ -89,6 +89,9 @@ export default {
     this.eventBus.on('updateRow', (args) => {
       this.updateRow(args)
     })
+    this.eventBus.on('filteredRows', (args) => {
+      this.filterRows(args)
+    })
 
     this.columnDefs = [
       {
@@ -116,8 +119,8 @@ export default {
         field: "thumbnail",
         cellRenderer: function (params) {
           let thumbnail_url = params.data.thumbnail_url;
-          let Marketplace_url = "https://www.unrealengine.com/marketplace/en-US/item/" + params.data.id;
-          let launcher_url = "com.epicgames.launcher://ue/marketplace/item/" + params.data.id;
+          let Marketplace_url = "https://www.unrealengine.com/marketplace/en-US/item/" + params.data.catalogItemId;
+          let launcher_url = "com.epicgames.launcher://ue/marketplace/item/" + params.data.catalogItemId;
           let img = `<a href=${launcher_url} target="_blank"><img  width="100" height="100" src= ${thumbnail_url}>`;
           return img;
         }
@@ -147,6 +150,9 @@ export default {
       '<span class="ag-overlay-loading-center">Please wait while your rows are loading. This could take a minute to refresh your data.</span>';
   },
   methods: {
+    filterRows(args) {
+      this.gridApi.setRowData(args.rows);
+    },
     updateRow(args) {
       let rowNode = this.gridApi.getRowNode(args.rowID);
       rowNode.setDataValue('comment', args.comment);

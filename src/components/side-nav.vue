@@ -1,36 +1,36 @@
 <template>
-  <div id="menu" class="q-pa-xs text-h6 bg-primary text-white">Menu</div>
+  <div id="menu" class="q-pa-xs text-h6 bg-primary text-white">Unreal Vault Organizer</div>
   <div id="tag_item" class="q-pa-xs">Add new tags. Double click to edit.</div>
-
-  <q-select
-    filled
-    v-model="tags"
-    use-input
-    use-chips
-    multiple
-    hint="Separate multiple values by [,;|]"
-    hide-dropdown-icon
-    input-debounce="0"
-    @new-value="createValue"
-    style="max-width: 200px"
-  >
-
-    <template v-slot:option="scope">
-      <q-item
-        v-bind="scope.itemProps"
+  <div class="row">
+    <div class="col">
+      <q-select
+        filled
+        v-model="tags"
+        use-input
+        use-chips
+        multiple
+        hint="Separate multiple values by [,;|]"
+        hide-dropdown-icon
+        input-debounce="0"
+        @new-value="createValue"
+        style="max-width: 200px"
       >
-        <q-item-section>
-          <q-item-label v-html="scope.opt.label"></q-item-label>
-        </q-item-section>
-        <q-item-section avatar>
-          <q-avatar :color=scope.opt.color></q-avatar>
-        </q-item-section>
-      </q-item>
-    </template>
 
-  </q-select>
+        <template v-slot:option="scope">
+          <q-item
+            v-bind="scope.itemProps"
+          >
+            <q-item-section>
+              <q-item-label v-html="scope.opt.label"></q-item-label>
+            </q-item-section>
+            <q-item-section avatar>
+              <q-avatar :color=scope.opt.color></q-avatar>
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
 
-  <span v-for="tag in tag_info_options">
+      <span v-for="tag in tag_info_options">
           <q-chip
             removable
             clickable
@@ -43,6 +43,32 @@
             <div class="q-pl-md q-ma-xs">{{ tag.label }}</div>
       </q-chip>
   </span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-auto">
+      <q-btn class="q-pt-none"
+             dense
+             size="19px"
+             @click="filterByTags"
+             color="primary"
+             label="Filter Tags by"></q-btn>
+    </div>
+    <div class="col-auto justify-start">
+      <q-select
+        dense
+        options-dense
+        narrow-indicator
+        hide-dropdown-icon
+        hide-bottom-space
+        filled
+        v-model="filter_by"
+        :options="filter_by_options"
+        style="width: 100px"
+      />
+
+    </div>
+  </div>
 
   <q-dialog v-model="tag_edit">
 
@@ -89,11 +115,13 @@
       <q-btn @click="saveTagInfo" color="primary" label="Save Tag"/>
     </q-card>
   </q-dialog>
+
 </template>
 
 <script>
 import {ref} from 'vue'
 import database from '../database';
+import {db} from "src/db";
 
 let refresh_grid_options = {}
 
@@ -103,6 +131,13 @@ export default {
 
     return {
       tags: ref([]),
+      filter_by: ref('And'),
+      filter_by_options: ref(
+        [
+          {label: 'And', value: 'And'},
+          {label: 'Or', value: 'Or'}
+        ]
+      ),
       new_tags: ref([]),
       tag_clicked: {},
       tag_info_options: ref([]),
@@ -122,9 +157,59 @@ export default {
     await this.loadData()
   },
   methods: {
-    filterGrid(selected_tags) {
-      // console.log(selected_tags)
+    equalsIgnoreOrder(a, b) {
+      if (a.length !== b.length) return false;
+      const uniqueValues = new Set([...a, ...b]);
+      for (const v of uniqueValues) {
+        const aCount = a.filter(e => e === v).length;
+        const bCount = b.filter(e => e === v).length;
+        if (aCount !== bCount) return false;
+      }
+      return true;
     },
+    async filterByTags() {
+
+      let filteredRows = []
+      let tagIds = []
+      let operator = this.filter_by
+      if (this.selected_tags.length > 0) {
+        for (let tag of this.selected_tags) {
+          tagIds.push(tag.id)
+        }
+      }
+      if (typeof operator !== 'string') {
+        operator = operator.label
+      }
+
+      let rows
+      //Or
+      console.log(operator)
+      if (operator === 'Or') {
+        console.log('test')
+        console.log(tagIds)
+        filteredRows = await db.vault_library.where('tagIds').anyOf(tagIds).toArray() || []
+
+        console.log(filteredRows)
+      } else if (operator === 'And') {
+        rows = await db.vault_library.toArray()
+        for (let row of rows) {
+          if (row.tagIds) {
+            if (row.tagIds.length > 0) {
+              if (this.equalsIgnoreOrder(row.tagIds, tagIds) === true) {
+                filteredRows.push(row)
+              }
+            }
+          }
+        }
+      }
+      if (filteredRows.length > 0) {
+        //Send filtered rows
+        this.eventBus.emit('filteredRows', {rows: filteredRows})
+      }else if(tagIds.length === 0){
+        this.eventBus.emit('filteredRows', {rows: rows})
+      }
+    },
+
     selectedTag(tag) {
       if (tag.selected === true) {
         this.selected_tags.push(tag)
@@ -157,7 +242,7 @@ export default {
     },
 
     displayTag(tag) {
-     this.tag_color={}
+      this.tag_color = {}
       this.tag_edit = true
       this.tag_clicked = tag
       this.tag_label = tag.label
