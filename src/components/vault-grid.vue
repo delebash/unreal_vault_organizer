@@ -82,7 +82,7 @@ export default {
 
   async mounted() {
     this.eventBus.on('refreshGrid', (args) => {
-      this.refreshGrid(args)
+      this.loadGrid()
     })
     this.eventBus.on('updateRow', (args) => {
       this.updateRow(args)
