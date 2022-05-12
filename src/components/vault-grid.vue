@@ -29,10 +29,7 @@
 import {ref} from 'vue'
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
-import database from '../database';
 import {db} from '../db';
-import {useObservable} from "@vueuse/rxjs";
-import {liveQuery} from "dexie";
 
 let fetch_options = {
   method: '',
@@ -160,7 +157,6 @@ export default {
     refreshGrid(params) {
       this.gridApi.redrawRows()
     },
-
     async getVaultRows() {
       let user_settings = await db.user_settings.toCollection().first();
       this.unreal_token = user_settings.unreal_token
@@ -226,31 +222,11 @@ export default {
       await this.loadGrid();
     },
     async loadGrid() {
-
       let catalogItems = await db.vault_library.toArray()
       this.rowData = await Promise.all(catalogItems.map(async catalogItem => {
         catalogItem.tags = await db.tags.where('id').anyOf([1]).toArray()
         return catalogItem
       }));
-
-
-      // console.log(JSON.stringify(this.catalogItems))
-//console.log(this.catalogItems)
-      //     this.rowData = this.catalogItems
-
-      //   let results =  await this.getJoin()
-      //  console.log(results)
-      // this.additional_row_info = await database.getRows('additional_row_info') || []
-
-      // // //  console.log(this.rowData)
-      // this.tag_info_options = await database.getRows('tags') || [];
-      // if (this.catalogItems.length > 0) {
-      //   let rows = []
-      //   let labels = []
-      //   for (let tag of this.tag_info_options) {
-      //     labels.push(tag.label)
-      //   }
-      // }
     },
     onSelectionChanged() {
       let that = this
@@ -266,66 +242,13 @@ export default {
     onFirstDataRendered(params) {
       // params.api.sizeColumnsToFit();
     },
-    getComment() {
-      //return 'test'
-    },
     async onCellValueChanged(event) {
-      await db.vault_library.update(event.data.catalogItemId, {
-        comment: event.data.comment
-      })
+      if (event.column.colId === 'comment') {
+        await db.vault_library.update(event.data.catalogItemId, {
+          comment: event.data.comment
+        })
+      }
     }
   }
 }
-
-
-// let catalogItemId = event.data.catalogItemId
-// console.log(catalogItemId)
-// let description = event.data.description
-// let title = event.data.title
-// let thumbnail_url = event.data.thumbnail_url
-// let comment = event.data.comment
-// let tagIds = event.data.tagIds
-//
-// await db.vault_library.put({
-//   catalogItemId: catalogItemId,
-//   description: description,
-//   title: title,
-//   thumbnail_url: thumbnail_url,
-//   comment: comment,
-//   tagIds: tagIds
-// })
-
-
-//   console.log(params)
-//   let rowNode = params.node
-//  // rowNode.setDataValue('comment', 'test');
-//   this.test(params).then(function (data) {
-//     // console.log('test')
-//
-//    // console.log(params.node)
-//  //   let rowNode = params.node
-//    // rowNode.setDataValue('comment', 'test');
-//     // params.api.refreshCells({
-//     //   rowNodes: [params.node],
-//     //   columns: [params.column]
-//     // });
-//   });
-//   return false
-// }
-
-//async test(params) {
-// let value = await db.get('additional_row_info', params.data.id) || ''
-//console.log('test')
-//  let rowNode = params.node
-// rowNode.setDataValue('comment', 'comment');
-//  return 'test'
-// }
-
-// async setData() {
-//   let meta = {}
-//   meta.comment = "hhhh"
-//   await db.put('vault', meta, this.selectedRowId);
-//   let rowNode = this.gridApi.getRowNode(this.selectedRowId);
-//   rowNode.setDataValue('comment', meta.comment);
-// },
 </script>

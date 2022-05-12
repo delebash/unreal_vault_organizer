@@ -79,7 +79,6 @@
 
 import {ref} from 'vue'
 import {useQuasar} from 'quasar'
-import database from '../database';
 import SideNav from 'components/side-nav.vue';
 import {db} from '../db'
 
@@ -92,23 +91,8 @@ export default {
   setup() {
     const $q = useQuasar()
     return {
-      tag_clicked: ref({}),
-      tag_color: ref({}),
-      selected_tags: [],
-      tag_edit: ref(false),
-      tag_label: ref(''),
-      tag_id: ref(''),
-      tags: ref([]),
-      add_tag: ref([]),
-      new_tags: ref([]),
-      temp_color_options: [],
       launcher_path: ref(''),
       sniffer_path: ref(''),
-      tag_color_options: [
-        {label: 'amber-5', value: 'amber-5'},
-        {label: 'red-11', value: 'red-11'},
-        {label: 'grey', value: 'grey'},
-      ],
       isPwd: ref(true),
       selectedTab: ref('vault'),
       unreal_token: ref(''),
@@ -120,81 +104,10 @@ export default {
     await this.loadData()
   },
   methods: {
-    //Begin Side Bar Methods
-    filterGrid(selected_tags) {
-      // console.log(selected_tags)
-    },
-    // selectedTag(tag) {
-    //   if (tag.selected === true) {
-    //     this.selected_tags.push(tag)
-    //   } else {
-    //     const index = this.selected_tags.findIndex(({label}) => label === tag.label);
-    //     this.selected_tags.splice(index, 1)
-    //   }
-    // },
-    async saveTagInfo() {
-      // refresh_grid_options.refresh = true
-      // this.tag_clicked.label = this.tag_label
-      // this.tag_clicked.color = this.tag_color.value
-      // this.tag_edit = false
-      //
-      // let data = {
-      //   id: this.tag_clicked.id,
-      //   color: this.tag_clicked.color,
-      //   label: this.tag_clicked.label,
-      //   value: this.tag_clicked.value,
-      // }
-      //
-      // await database.putRow('tags', data)
-      this.tag_edit = false
-    },
-    async removeTag(tag) {
-      const index = this.tags.findIndex(({label}) => label === tag.label);
-      this.tags.splice(index, 1)
-      await database.deleteRow('tags', tag.id)
-    },
-    displayTag(tag) {
-      console.log(tag)
-      // console.log(this.tag_color_options)
-      this.tag_edit = true
-      this.tag_clicked = tag
-      this.tag_label = tag.label
-      this.tag_color.value = tag.color
-      this.tag_color.label = tag.color
-    },
-    async createValue(val, done) {
-      refresh_grid_options.refresh = true
-
-      // specific logic to eventually call done(...) -- or not
-      done(val, 'add-unique')
-      if (val.length > 0) {
-        val
-          .split(/[,;|]+/)
-          .map(v => v.trim())
-          .filter(v => v.length > 0)
-          .forEach(v => {
-            const found = this.tag_info_options.some(item => item.label === v);
-            if (found === false) {
-              let obj = {label: v, value: v, color: 'grey'}
-              this.new_tags.push(obj)
-            }
-          })
-        done(null)
-
-        for (let tag of this.new_tags) {
-          let data = JSON.parse(JSON.stringify(tag));
-          // this.saveDb('tags', data, 'ADD')
-        }
-        this.tags = []
-        this.new_tags = []
-      }
-    },
-    //End Nav Bar Methods
-
     async getToken() {
-     // let snifferPath = 'Fiddler.exe'
-     // let launcherPath = 'F:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win64\EpicGamesLauncher.exe'
-      let data = await window.myNodeApi.launchSniffer(this.sniffer_path,this.launcher_path)
+      // let snifferPath = 'Fiddler.exe'
+      // let launcherPath = 'F:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win64\EpicGamesLauncher.exe'
+      let data = await window.myNodeApi.launchSniffer(this.sniffer_path, this.launcher_path)
 
       const dataArray = data.split(",");
       this.unreal_token = dataArray[0].toString()

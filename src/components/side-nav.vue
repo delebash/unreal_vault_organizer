@@ -78,14 +78,12 @@
         <div class="text-h6">Change tag properties</div>
       </q-card-section>
       <q-input v-model="tag_label" label="Tag Name"/>
-
       <q-select
         filled
         use-chips
         v-model="tag_color"
         :options="tag_color_options"
       >
-
         <template v-slot:option="scope">
           <q-item
             v-bind="scope.itemProps"
@@ -98,7 +96,6 @@
             </q-item-section>
           </q-item>
         </template>
-
         <template v-slot:selected-item="scope">
           <q-chip
             removable
@@ -115,20 +112,14 @@
       <q-btn @click="saveTagInfo" color="primary" label="Save Tag"/>
     </q-card>
   </q-dialog>
-
 </template>
 
 <script>
 import {ref} from 'vue'
-import database from '../database';
 import {db} from "src/db";
 
-let refresh_grid_options = {}
-
 export default {
-
   setup() {
-
     return {
       tags: ref([]),
       filter_by: ref('And'),
@@ -145,7 +136,6 @@ export default {
       tag_edit: ref(false),
       tag_label: ref(''),
       tag_color: ref({}),
-      temp_tag_color_options: [],
       tag_color_options: ref([
         {label: 'amber-5', value: 'amber-5'},
         {label: 'red-11', value: 'red-11'},
@@ -168,7 +158,6 @@ export default {
       return true;
     },
     async filterByTags() {
-
       let filteredRows = []
       let tagIds = []
       let operator = this.filter_by
@@ -176,40 +165,30 @@ export default {
         for (let tag of this.selected_tags) {
           tagIds.push(tag.id)
         }
-      }
-      if (typeof operator !== 'string') {
-        operator = operator.label
-      }
-
-      let rows
-      //Or
-      console.log(operator)
-      if (operator === 'Or') {
-        console.log('test')
-        console.log(tagIds)
-        filteredRows = await db.vault_library.where('tagIds').anyOf(tagIds).toArray() || []
-
-        console.log(filteredRows)
-      } else if (operator === 'And') {
-        rows = await db.vault_library.toArray()
-        for (let row of rows) {
-          if (row.tagIds) {
-            if (row.tagIds.length > 0) {
-              if (this.equalsIgnoreOrder(row.tagIds, tagIds) === true) {
-                filteredRows.push(row)
+        if (typeof operator !== 'string') {
+          operator = operator.label
+        }
+        let rows
+        //Or
+        if (operator === 'Or' || tagIds.length === 1) {
+          filteredRows = await db.vault_library.where('tagIds').anyOf(tagIds).toArray()
+        } else if (operator === 'And') {
+          rows = await db.vault_library.toArray()
+          for (let row of rows) {
+            if (row.tagIds) {
+              if (row.tagIds.length > 0) {
+                if (this.equalsIgnoreOrder(row.tagIds, tagIds) === true) {
+                  filteredRows.push(row)
+                }
               }
             }
           }
         }
+      } else {
+        filteredRows = await db.vault_library.toArray()
       }
-      if (filteredRows.length > 0) {
-        //Send filtered rows
-        this.eventBus.emit('filteredRows', {rows: filteredRows})
-      }else if(tagIds.length === 0){
-        this.eventBus.emit('filteredRows', {rows: rows})
-      }
+      this.eventBus.emit('filteredRows', {rows: filteredRows})
     },
-
     selectedTag(tag) {
       if (tag.selected === true) {
         this.selected_tags.push(tag)
@@ -219,28 +198,24 @@ export default {
       }
     },
     async saveTagInfo() {
-      console.log(this.tag_color)
-      refresh_grid_options.refresh = true
       this.tag_clicked.label = this.tag_label
       this.tag_clicked.color = this.tag_color.value
       this.tag_edit = false
-
-      let data = {
+      await db.tags.put({
         id: this.tag_clicked.id,
         label: this.tag_clicked.label,
         value: this.tag_clicked.value,
         color: this.tag_clicked.color
-      }
-      await database.putRow('tags', data)
+      })
+      this.eventBus.emit('refreshGrid', {})
     },
     async removeTag(tag) {
-      refresh_grid_options.refresh = true
       const index = this.tag_info_options.findIndex(({label}) => label === tag.label);
       this.tag_info_options.splice(index, 1)
       this.selected_tags.splice(index, 1)
-      await database.deleteRow('tags', tag.id)
+      await db.tags.delete(tag.id)
+      this.eventBus.emit('refreshGrid', {})
     },
-
     displayTag(tag) {
       this.tag_color = {}
       this.tag_edit = true
@@ -250,8 +225,6 @@ export default {
       this.tag_color.label = tag.color
     },
     async createValue(val, done) {
-      refresh_grid_options.refresh = true
-
       // specific logic to eventually call done(...) -- or not
       done(val, 'add-unique')
       if (val.length > 0) {
@@ -269,21 +242,21 @@ export default {
         done(null)
 
         for (let tag of this.new_tags) {
-          let data = {
-            label: tag.label,
+            let id = await db.tags.add({
             value: tag.value,
+            label: tag.label,
             color: tag.color
-          }
-          let id = await database.addRow('tags', data)
+          })
           tag.id = id
           this.tag_info_options.push(tag)
         }
         this.tags = []
         this.new_tags = []
+        this.eventBus.emit('refreshGrid', {})
       }
     },
     async loadData() {
-      this.tag_info_options = await database.getRows('tags') || []
+      this.tag_info_options = await db.tags.toArray()
     }
   }
 }

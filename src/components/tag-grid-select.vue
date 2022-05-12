@@ -86,7 +86,6 @@ export default {
       this.tag_info_options = await db.tags.toArray()
       if (this.params.data.tagIds !== undefined) {
         this.tags = await db.tags.where('id').anyOf(this.params.data.tagIds).toArray() || []
-       // console.log(this.tags)
       }
     }
   }
