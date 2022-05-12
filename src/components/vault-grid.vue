@@ -7,6 +7,7 @@
       style="width: 100%; height: 73%;"
       class="ag-theme-alpine"
       id="myGrid"
+      :refreshCells="true"
       :columnDefs="columnDefs"
       @grid-ready="onGridReady"
       :defaultColDef="defaultColDef"
@@ -127,6 +128,7 @@ export default {
         field: 'tags',
         autoHeight: true,
         editable: false,
+        colId: 'tags',
         cellRenderer: 'tag-grid-select',
         width: 270,
       },
@@ -154,7 +156,7 @@ export default {
       let rowNode = this.gridApi.getRowNode(args.rowID);
       rowNode.setDataValue('comment', args.comment);
     },
-    refreshGrid(params) {
+    refreshGrid(test) {
       this.gridApi.redrawRows()
     },
     async getVaultRows() {

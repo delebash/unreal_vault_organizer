@@ -207,7 +207,7 @@ export default {
         value: this.tag_clicked.value,
         color: this.tag_clicked.color
       })
-      this.eventBus.emit('refreshGrid', {})
+     this.eventBus.emit('refreshGrid', {})
     },
     async removeTag(tag) {
       const index = this.tag_info_options.findIndex(({label}) => label === tag.label);
