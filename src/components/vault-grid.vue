@@ -7,7 +7,7 @@
     <q-btn class="q-pt-none" dense @click="loadGrid" color="deep-orange-12"
            label="Refresh Grid"></q-btn>
     <ag-grid-vue
-      style="width: 100%; height: 73%;"
+      style="width: 100%; height: 94%;"
       class="ag-theme-alpine"
       id="myGrid"
       :refreshCells="true"
