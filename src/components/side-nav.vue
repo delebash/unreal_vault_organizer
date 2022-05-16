@@ -13,7 +13,7 @@
         hide-dropdown-icon
         input-debounce="0"
         @new-value="createValue"
-        style="max-width: 200px"
+        style="max-width: 100%"
       >
 
         <template v-slot:option="scope">
