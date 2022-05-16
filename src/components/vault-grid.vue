@@ -194,7 +194,7 @@ export default {
 
       let catalog_url = 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/ue/bulk/items?includeDLCDetails=false&includeMainGameDetails=false&country=US&locale=en'
       let entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/' + this.account_number + '/entitlements'
-      let count_params1 = '?start=0&count=1000'
+      let count_params1 = '?start=0&count=5000'
       // let count_params2 = '?start=1000&count=1000'
       //Get list of entitlements for catalog query
       entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/27966d5331e047a0a4e4b8ed06f3d0ef/entitlements'
