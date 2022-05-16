@@ -119,13 +119,14 @@ export default {
       {
         headerName: "Image",
         editable: false,
-        width: 100,
+        width: 125,
+        autoHeight: true,
         field: "thumbnail",
         cellRenderer: function (params) {
           let thumbnail_url = params.data.thumbnail_url;
           let Marketplace_url = "https://www.unrealengine.com/marketplace/en-US/item/" + params.data.catalogItemId;
           let launcher_url = "com.epicgames.launcher://ue/marketplace/item/" + params.data.catalogItemId;
-          let img = `<a href=${launcher_url} target="_blank"><img  width="100" height="100" src= ${thumbnail_url}>`;
+          let img = `<a href=${launcher_url} target="_blank"><img  width="125" height="125" src= ${thumbnail_url}>`;
           return img;
         }
       },
