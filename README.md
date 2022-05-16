@@ -1,24 +1,19 @@
-# Unreal Vault Organizer (unreal_vault_organizer)
+# Unreal Vault Organizer using Electron (unreal_vault_organizer)
 
 Organize your unreal vault plugins
 
 ## Install the dependencies
 ```bash
-yarn
-# or
 npm install
 ```
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 ```bash
-quasar dev
+npm start
+# or
+npm run debug
 ```
 
+A simple application that downloads your unreal vault inventory and allows you to organize it by tags.  In addition it will notify you when you have updates for a plugin.  You can then sort by updates to determine which plugins have updates available(still testing this)
 
-### Build the app for production
-```bash
-quasar build
-```
-
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+Please watch video for installation instructions.  You will need to install the free version of Fiddler Classic from telerik.

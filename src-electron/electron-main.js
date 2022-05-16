@@ -82,7 +82,7 @@ function createWindow () {
 
   if (process.env.DEBUGGING) {
     // if on DEV or Production with debug enabled
-    mainWindow.webContents.openDevTools()
+    mainWindow.webContents.closeDevTools()
   } else {
     // we're on production; no access to devtools pls
     mainWindow.webContents.on('devtools-opened', () => {
