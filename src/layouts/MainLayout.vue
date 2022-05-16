@@ -5,11 +5,11 @@
     <q-page-container>
 
       <q-page class="row no-margin q-pa-xs">
-        <q-card class="col-3">
+        <q-card class="col-2">
           <!-- drawer content -->
           <side-nav></side-nav>
         </q-card>
-        <q-card class="col-9">
+        <q-card class="col-10">
           <q-tabs
             dense
             v-model="selectedTab"

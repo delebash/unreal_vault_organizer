@@ -52,7 +52,7 @@
              size="19px"
              @click="filterByTags"
              color="primary"
-             label="Filter Tags by"></q-btn>
+             label="Filter Tags by operator"></q-btn>
 
     </div>
 
@@ -189,7 +189,16 @@ export default {
       } else {
         filteredRows = await db.vault_library.toArray()
       }
+      //only unique rowsS
+      filteredRows = this.uniqBy(filteredRows, JSON.stringify)
       this.eventBus.emit('filteredRows', {rows: filteredRows})
+    },
+    uniqBy(a, key) {
+      let seen = new Set();
+      return a.filter(item => {
+        let k = key(item);
+        return seen.has(k) ? false : seen.add(k);
+      });
     },
     selectedTag(tag) {
       if (tag.selected === true) {
@@ -209,7 +218,7 @@ export default {
         value: this.tag_clicked.value,
         color: this.tag_clicked.color
       })
-     this.eventBus.emit('refreshGrid', {})
+      this.eventBus.emit('refreshGrid', {})
     },
     async removeTag(tag) {
       const index = this.tag_info_options.findIndex(({label}) => label === tag.label);
@@ -244,7 +253,7 @@ export default {
         done(null)
 
         for (let tag of this.new_tags) {
-            let id = await db.tags.add({
+          let id = await db.tags.add({
             value: tag.value,
             label: tag.label,
             color: tag.color

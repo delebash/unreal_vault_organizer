@@ -36,6 +36,7 @@ import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import {db} from '../db';
 import {useQuasar, Notify} from 'quasar'
 
+let updates = false
 let fetch_options = {
   method: '',
   headers: {},
@@ -275,7 +276,7 @@ export default {
       await this.loadGrid();
     },
     async loadGrid() {
-      this.qt.loading.show()
+     // this.qt.loading.show()
       let user_settings = await db.user_settings.where("id").equals(1).first();
       this.unreal_token = user_settings.unreal_token
       this.account_number = user_settings.account_number
@@ -284,15 +285,20 @@ export default {
       this.build_versions = await window.myNodeApi.get_build_versions(this.vault_cache_path)
 
       let catalogItems = await db.vault_library.toArray()
+      updates = false
       this.rowData = await Promise.all(catalogItems.map(async catalogItem => {
         catalogItem.tags = await db.tags.where('id').anyOf([1]).toArray()
         catalogItem.updates_available = await this.getVaultUpdates(catalogItem)
         return catalogItem
       }));
-      this.qt.loading.hide()
+
+      if (updates === true){
+        this.showNotify('Updates available', 'secondary', 'top')
+      }
+   //   this.qt.loading.hide()
     },
     async getVaultUpdates(catalogItem) {
-      let updates = false
+
       for (let build of this.build_versions) {
         if (catalogItem.catalogItemId === build.CatalogItemId) {
           if (catalogItem.buildVersion !== build.BuildVersionString) {
@@ -302,9 +308,6 @@ export default {
             return '0'
           }
         }
-      }
-      if (updates === true){
-        this.showNotify('Updates available', 'secondary', 'top')
       }
     },
     onSelectionChanged() {
