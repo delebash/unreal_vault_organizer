@@ -1,0 +1,638 @@
+{
+  "id": "8e288fabbc5d49d39cf498eb2cfb15ae",
+  "title": "Simple Color Wheel",
+  "description": "A simple color wheel that can be used to pick colors, features additional helper nodes and is totally free!",
+  "longDescription": "<p><strong>Version: 2021.1.4</strong></p><p><strong>Contact: </strong><a href=\"mailto:w2.wizzard&#64;gmail.com\" rel=\"nofollow\">w2.wizzard&#64;gmail.com</a></p><p><strong><u>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯</u></strong></p><p><strong>Example Video</strong></p><p><a href=\"https://youtu.be/y8u3N1d2stU\" rel=\"nofollow\"><strong>https://youtu.be/y8u3N1d2stU</strong></a></p><p><br /></p><p><strong><em><u>How do I use it?</u></em></strong></p><p><strong><em><u>Simply open up the UMG Editor and it should be there under Input!</u></em></strong></p><p><strong><u>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯</u></strong></p><p><br /></p><p><strong>Note: The widget shown is not included its just to prove the concept that its possible!</strong></p><p>This simple color wheel allows you to do just what a color wheel is supposed to do.</p><p>Comes with all necessary features that should make it possible to make a proper widget with it:</p><ul><li>Function Helpers that allow for linearcolor, color and byte conversions to hexadecimal values as strings and vice versa as well as getting the pixel under the cursor.</li><li>Events such as getting and setting the colors (setting does automatically update the pin) as well as mouse detection for when the widget is pressed and released.</li></ul><p><br /></p><p>Its all just 1 Widget, there are no hooks or weird tricks in store, simply drag and drop and there you go!</p><p>If you are curious about the code its all clean with proper comments incase you want to understand the insides!</p>",
+  "technicalDetails": "<p><strong>Features</strong>:</p><ul><li>Hexadecimal conversions for colors and bytes.</li><li>Color wheel with movable Pin.</li><li>Pin can be changed to any texture or brush</li><li>Ability to get and set the colors, will update automatically.</li><li>Clean written and understandable code comments.</li></ul><p><br /></p><p><strong>Code Modules:</strong></p><ul><li> ColorWheelPlugin | Runtime</li></ul><p><br /></p><p><strong>Number of Blueprints</strong>: 0</p><p><strong>Number of C&#43;&#43; Classes</strong>: 4</p><p><strong>Supported Development Platforms</strong>: Win(32/64)</p><p><strong>Supported Target Build Platforms</strong>: Win(32/64)</p><p><strong>For non-supported Platforms: </strong>Linux and MacOS should work in theory, however I am unable to test on it.</p><p><strong>Documentation</strong>: The code comments provide full detail of almost everything.</p><p><strong>Important/Additional Notes</strong>: If you require a special version or really anything, let me know!</p>",
+  "keyImages": [
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/Screenshot 2020-12-01 222912-1920x1080-102a48edd7364df982201b2afe49681a.png",
+      "md5": "102a48edd7364df982201b2afe49681a",
+      "width": 1920,
+      "height": 1080,
+      "size": 913880,
+      "uploadedDate": "2020-12-02T18:26:47.349Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/Screenshot 2020-12-01 210954-1920x1080-fef9dff884ce806d201d470a3329c532.png",
+      "md5": "fef9dff884ce806d201d470a3329c532",
+      "width": 1920,
+      "height": 1080,
+      "size": 1617974,
+      "uploadedDate": "2020-12-02T18:27:45.348Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/Screenshot 2020-12-01 211120-1920x1080-900704d5e10788aed0ad8046caf672ec.png",
+      "md5": "900704d5e10788aed0ad8046caf672ec",
+      "width": 1920,
+      "height": 1080,
+      "size": 354792,
+      "uploadedDate": "2020-12-02T18:28:57.335Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/Screenshot 2020-12-01 211226-1920x1080-3560a594c3242ba624ab5f0e3ba9f3b0.png",
+      "md5": "3560a594c3242ba624ab5f0e3ba9f3b0",
+      "width": 1920,
+      "height": 1080,
+      "size": 345819,
+      "uploadedDate": "2020-12-02T18:28:57.705Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/Screenshot 2020-12-01 211551-1920x1080-882c24dcd48a605c4e060d72538840b4.png",
+      "md5": "882c24dcd48a605c4e060d72538840b4",
+      "width": 1920,
+      "height": 1080,
+      "size": 264138,
+      "uploadedDate": "2020-12-02T18:47:22.435Z"
+    },
+    {
+      "type": "Thumbnail",
+      "url": "https://cdn1.epicgames.com/ue/product/Thumbnail/SimpleColorWheel_thumb-284x284-1ab245e8e2eeba12e22c7d25a7525fb3.png",
+      "md5": "1ab245e8e2eeba12e22c7d25a7525fb3",
+      "width": 284,
+      "height": 284,
+      "size": 43573,
+      "uploadedDate": "2020-10-31T20:15:07.492Z"
+    },
+    {
+      "type": "Featured",
+      "url": "https://cdn1.epicgames.com/ue/product/Featured/SimpleColorWheel_featured-894x488-90560e9065fee507633993796c2e4594.png",
+      "md5": "90560e9065fee507633993796c2e4594",
+      "width": 894,
+      "height": 488,
+      "size": 55634,
+      "uploadedDate": "2020-12-02T16:54:11.977Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Screenshot 2020-12-01 211551-1920x1080-882c24dcd48a605c4e060d72538840b4_Snapshot.png",
+      "md5": "76395708e16ddb04b204d4bbacb41370",
+      "width": 150,
+      "height": 74,
+      "size": 4950,
+      "uploadedDate": "2020-12-02T18:47:22.641Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Screenshot 2020-12-01 211551-1920x1080-882c24dcd48a605c4e060d72538840b4_Snapshot.png",
+      "md5": "76395708e16ddb04b204d4bbacb41370",
+      "width": 150,
+      "height": 74,
+      "size": 4950,
+      "uploadedDate": "2020-12-02T18:34:35.768Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Screenshot 2020-12-01 211120-1920x1080-900704d5e10788aed0ad8046caf672ec_Snapshot.png",
+      "md5": "a9caec03771ef9263406fc35f26b77bc",
+      "width": 150,
+      "height": 74,
+      "size": 5161,
+      "uploadedDate": "2020-12-02T18:28:57.586Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Screenshot 2020-12-01 211226-1920x1080-3560a594c3242ba624ab5f0e3ba9f3b0_Snapshot.png",
+      "md5": "b57b7e0e34138d05323c3317058f81df",
+      "width": 150,
+      "height": 74,
+      "size": 5273,
+      "uploadedDate": "2020-12-02T18:28:57.913Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Screenshot 2020-12-01 211551-1920x1080-dcb5331b8f4d41bce71a3ebc57325bba_Snapshot.png",
+      "md5": "ca900de428dd048a809d5c3e77fb11ee",
+      "width": 150,
+      "height": 74,
+      "size": 5033,
+      "uploadedDate": "2020-12-02T18:28:58.365Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Screenshot 2020-12-01 210954-1920x1080-fef9dff884ce806d201d470a3329c532_Snapshot.png",
+      "md5": "6af2e3e062c5014fa7d871e07153ebb4",
+      "width": 150,
+      "height": 74,
+      "size": 5396,
+      "uploadedDate": "2020-12-02T18:27:45.635Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Screenshot 2020-12-01 222912-1920x1080-102a48edd7364df982201b2afe49681a_Snapshot.png",
+      "md5": "3fe751a0b4bd3345c9a54d5b1ac933bf",
+      "width": 150,
+      "height": 74,
+      "size": 6450,
+      "uploadedDate": "2020-12-02T18:26:47.622Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Screenshot 2020-11-21 222251-1920x1080-5f25816bdab0542a00ee6ac71e7d749b_Snapshot.png",
+      "md5": "ad71fd220ddb3232e4a9f2c488e91578",
+      "width": 150,
+      "height": 74,
+      "size": 4725,
+      "uploadedDate": "2020-11-21T21:34:47.234Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Screenshot 2020-11-21 222556-1920x1080-53b6c9948e8e08774ce45c2deea4a675_Snapshot.png",
+      "md5": "6b9e02940e4cd652897b4dddb71a5198",
+      "width": 150,
+      "height": 74,
+      "size": 5205,
+      "uploadedDate": "2020-11-21T21:34:47.606Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Screenshot 2020-11-21 222711-1920x1080-bd2767d784ba3e052c8d6ce892503be7_Snapshot.png",
+      "md5": "6073df807506e2bcd6f7132abb8d66ac",
+      "width": 150,
+      "height": 74,
+      "size": 2372,
+      "uploadedDate": "2020-11-21T21:34:47.951Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/EdSplash-1920x1080-4b77cc66f7492f8e054027a64a12d146_Snapshot.png",
+      "md5": "4655ccb6865b9c8f5763dbbaf7dc346e",
+      "width": 150,
+      "height": 74,
+      "size": 5335,
+      "uploadedDate": "2020-11-05T22:23:11.134Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Example2-1920x1080-9c24391421217386c8b5c9ea7f7ce388_Snapshot.png",
+      "md5": "90b7c71d653c5dcf89c52ab8d7a66269",
+      "width": 150,
+      "height": 74,
+      "size": 2121,
+      "uploadedDate": "2020-11-05T22:23:11.496Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Example-1920x1080-dabe8051b5de955201f614e5d1b0ac86_Snapshot.png",
+      "md5": "c3d271a01a78754bdf5dff9b55117e13",
+      "width": 150,
+      "height": 74,
+      "size": 5112,
+      "uploadedDate": "2020-11-05T22:23:11.864Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/EdSplash-1920x1080-685702c4b01b4c3b437da51ead5a07f0_Snapshot.png",
+      "md5": "1e15d716e8e45dc58494262baf13dae4",
+      "width": 150,
+      "height": 74,
+      "size": 5033,
+      "uploadedDate": "2020-10-31T20:15:06.981Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/Nodes-1920x1080-55e8024ca21b8a1f21b95fa051be0e93_Snapshot.png",
+      "md5": "274e57e8204fbd53f5e9a665cdf67f17",
+      "width": 150,
+      "height": 74,
+      "size": 4850,
+      "uploadedDate": "2020-10-31T20:15:07.435Z"
+    }
+  ],
+  "categories": [
+    {
+      "path": "plugins/engine"
+    },
+    {
+      "path": "plugins"
+    }
+  ],
+  "namespace": "ue",
+  "status": "ACTIVE",
+  "creationDate": "2020-11-10T09:38:26.499Z",
+  "lastModifiedDate": "2021-09-29T06:42:28.005Z",
+  "entitlementName": "8e288fabbc5d49d39cf498eb2cfb15ae",
+  "entitlementType": "EXECUTABLE",
+  "itemType": "DURABLE",
+  "releaseInfo": [
+    {
+      "id": "16c17942a46248c481ca59d147ed49af",
+      "appId": "ColorWheelPlugin_4.24",
+      "compatibleApps": [
+        "UE_4.24"
+      ],
+      "platform": [
+        "Windows",
+        "Win32"
+      ],
+      "dateAdded": "2021-01-03T00:00:00.000Z",
+      "releaseNote": "- Added Brush for wheel itself due to request.",
+      "versionTitle": "2021.1.4_4.24"
+    },
+    {
+      "id": "33e04aa019ac4e2fb980a7b94ce0376a",
+      "appId": "ColorWheelPlugin_4.25",
+      "compatibleApps": [
+        "UE_4.25"
+      ],
+      "platform": [
+        "Windows",
+        "Win32"
+      ],
+      "dateAdded": "2020-10-31T00:00:00.000Z",
+      "releaseNote": "- Added Brush for wheel itself due to request.",
+      "versionTitle": "2021.1.4_4.25"
+    },
+    {
+      "id": "bcb6077759074e90a08c024ec11d4ced",
+      "appId": "ColorWheelPlugin_4.26",
+      "compatibleApps": [
+        "UE_4.26"
+      ],
+      "platform": [
+        "Windows",
+        "Win32"
+      ],
+      "dateAdded": "2020-12-03T00:00:00.000Z",
+      "releaseNote": "- Added Brush for wheel itself due to request.",
+      "versionTitle": "2021.1.4_4.26"
+    },
+    {
+      "id": "272b0dd7562a4008a24a46a3912ec109",
+      "appId": "ColorWheelPlugin_4.27",
+      "compatibleApps": [
+        "UE_4.27"
+      ],
+      "platform": [
+        "Windows",
+        "Win32"
+      ],
+      "dateAdded": "2021-09-22T00:00:00.000Z",
+      "releaseNote": "-Add support for 4.27",
+      "versionTitle": "2021.1.4_4.27"
+    }
+  ],
+  "developer": "W2Wizard",
+  "developerId": "o-atbhj5wumegn57bhjuqms5wp5xg8n7",
+  "endOfSupport": false,
+  "unsearchable": false
+}
+
+
+
+
+
+
+
+{
+  "id": "00104b426d934f00a45792085d98e88f",
+  "title": "OpenLand Grass - Customizable Game Ready Grass System",
+  "description": "With OpenLand Grass, you can add grass to your scene in a few minutes. They are customizable & optimized for performance. They also have RVT  based blending options, blueprint support among other features.",
+  "longDescription": "<p>&#x1f525;&#x1f525;&#x1f525; Use our new product <a href=\"https://www.unrealengine.com/marketplace/en-US/product/8484055184a148528c1ab9263d01c5d1\" rel=\"nofollow\">OneGrass Engine</a></p><p><br /></p><p>Grass &amp; foliage can make your scene looks pretty nice. But, they can be performance-heavy. OpenLand Grass looks good &amp; well optimized for performance. It ships with 5 types of grass, but you can make an unlimited number of variations with built-in customization tools.</p><p><br /></p><p>&#x1f3ab;<a href=\"https://youtu.be/uVigIPyJsSQ\" rel=\"nofollow\">Watch the Demo</a></p><p><br /></p><p><strong>Features:</strong></p><ul><li>8 Game Ready Grass Types with 24 density variations</li><li>Create an unlimited number of <a href=\"https://bit.ly/3cSZPSr\" rel=\"nofollow\">variations</a> with built-in customization tools.</li><li><a href=\"https://bit.ly/3tE7cE9\" rel=\"nofollow\">Works</a> with landscapes, foliage tool, or procedural foliage volumes</li><li><a href=\"https://bit.ly/3lxYa8Y\" rel=\"nofollow\">Bottom &amp; Distance blending</a> with Runtime Virtual Textures (RVT)</li><li><a href=\"https://bit.ly/3r3V0Ls\" rel=\"nofollow\">Hide Grass</a> under other static meshes (using RVTs)</li><li>Distance-based <a href=\"https://bit.ly/3c3WbGr\" rel=\"nofollow\">Z height blending</a></li><li><a href=\"https://bit.ly/2PezpT1\" rel=\"nofollow\">Wind Support</a> including Directional Wind</li><li><a href=\"https://bit.ly/3vLyytS\" rel=\"nofollow\">Blueprint based configurations</a> (both in editor &amp; runtime)</li><li>Texture based grass variations &amp; projects</li><li>Get access to all OpenLand&#39;s <a href=\"https://bit.ly/3c5T8xv\" rel=\"nofollow\">RVT blending Tools</a></li><li>Get access to TinyLand: (the core of OpenLand)</li></ul><p><br /></p><p><a href=\"https://bit.ly/391HqC3\" rel=\"nofollow\">&#x1f4da; <strong>Read the Documentation</strong></a></p>",
+  "technicalDetails": "<p>Features: (Please include a full, comprehensive list of the features of the product)</p><ul><li> 8 Game Ready Grass Types with 24 density variations (Low poly grass cards with proper LODs)</li><li> Landscape auto-material with 2 auto layers &amp; 5 paint layers</li><li> 2 Material functions to add additional custom paint layers</li><li>3 Material functions to add RVT based blending for grass &amp; static meshes</li><li>GPU based wind support with Blueprint control</li><li>20 Noises &amp; Variation Textures for grass</li></ul><p>Number of Unique Meshes: 24</p><p>LODs: Yes</p><p>Number of Materials and Material Instances: 10</p><p>Number of Textures: 32</p><p>Texture Resolutions: 2K</p><p>Supported Development Platforms:</p><p>Windows: Yes</p><p>Mac: No</p><p><br /></p><p><a href=\"https://bit.ly/391HqC3\" rel=\"nofollow\">&#x1f4da; <strong>Read the Documentation</strong></a></p><p>&#x1f64b; <a href=\"https://discord.gg/DK9cMn9eFV\" rel=\"nofollow\"><strong>Ask for Support</strong></a></p><p><strong>❓ </strong><a href=\"https://bit.ly/3fpGKdR\" rel=\"nofollow\"><strong>Feedback/Issues</strong></a></p><p><strong>&#x1f4c4; </strong><a href=\"https://github.com/GameDev4K/unreal-openland-grass/releases\" rel=\"nofollow\"><strong>ChangeLog</strong></a></p>",
+  "keyImages": [
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/000-GallaryFeaturedImage-1920x1080-8c9637d843b1a1b7e4e98bf0b8f41165.png",
+      "md5": "8c9637d843b1a1b7e4e98bf0b8f41165",
+      "width": 1920,
+      "height": 1080,
+      "size": 756475,
+      "uploadedDate": "2021-03-24T18:34:32.182Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/010-GallaryMultipleGrassTypes-1920x1080-bf5f6c5b148d54fa3ae772bcfd6c6143.png",
+      "md5": "bf5f6c5b148d54fa3ae772bcfd6c6143",
+      "width": 1920,
+      "height": 1080,
+      "size": 1129993,
+      "uploadedDate": "2021-03-24T18:35:52.302Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/020-GallaryColorsVariations-1920x1080-dee28aaa1dcb0646ec780562af31d19c.png",
+      "md5": "dee28aaa1dcb0646ec780562af31d19c",
+      "width": 1920,
+      "height": 1080,
+      "size": 950815,
+      "uploadedDate": "2021-03-24T18:35:52.561Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/025-GallaryUseVariationMaps-1920x1080-ef2da27eb49f15d245f10aa1f8c5f9f3.png",
+      "md5": "ef2da27eb49f15d245f10aa1f8c5f9f3",
+      "width": 1920,
+      "height": 1080,
+      "size": 1131041,
+      "uploadedDate": "2021-03-24T18:35:52.849Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/030-GallaryRVTDistanceBlend-1920x1080-d0c7f3142f96afb4545e386a0be33a02.png",
+      "md5": "d0c7f3142f96afb4545e386a0be33a02",
+      "width": 1920,
+      "height": 1080,
+      "size": 881737,
+      "uploadedDate": "2021-03-24T18:35:53.155Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/040-GallaryRVTBottomBlend-1920x1080-4238463a01bfede8762ab16d1456aec9.png",
+      "md5": "4238463a01bfede8762ab16d1456aec9",
+      "width": 1920,
+      "height": 1080,
+      "size": 1027764,
+      "uploadedDate": "2021-03-24T18:35:53.367Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/050-GallaryRVTHideGrass-1920x1080-269200cbc98ce9d758e509cde40b540b.png",
+      "md5": "269200cbc98ce9d758e509cde40b540b",
+      "width": 1920,
+      "height": 1080,
+      "size": 1331121,
+      "uploadedDate": "2021-03-24T18:35:53.638Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/060-GallaryZOffsetBlending-1920x1080-85f6f3dce8ee953b8708a449e78666d1.png",
+      "md5": "85f6f3dce8ee953b8708a449e78666d1",
+      "width": 1920,
+      "height": 1080,
+      "size": 808711,
+      "uploadedDate": "2021-03-24T18:35:53.969Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/070-GallaryGrassManager-1920x1080-2d0506a313f0a658aac6e94129960a14.png",
+      "md5": "2d0506a313f0a658aac6e94129960a14",
+      "width": 1920,
+      "height": 1080,
+      "size": 506285,
+      "uploadedDate": "2021-03-24T18:35:54.194Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/080-GallaryBlueprintSupport-1920x1080-f54b9220de4ccb908c17e8e535f482bc.png",
+      "md5": "f54b9220de4ccb908c17e8e535f482bc",
+      "width": 1920,
+      "height": 1080,
+      "size": 143152,
+      "uploadedDate": "2021-03-24T18:35:54.370Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/090-GallaryOpenLandRVT-1920x1080-01a9ad4eae73754c8f0f8e667235dbcc.png",
+      "md5": "01a9ad4eae73754c8f0f8e667235dbcc",
+      "width": 1920,
+      "height": 1080,
+      "size": 935515,
+      "uploadedDate": "2021-03-24T18:35:54.554Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/100-GallaryTinyLand-1920x1080-b149759074d87ac6838282e3d7740357.png",
+      "md5": "b149759074d87ac6838282e3d7740357",
+      "width": 1920,
+      "height": 1080,
+      "size": 358809,
+      "uploadedDate": "2021-03-24T18:35:54.777Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/070-GallaryCommunity-1920x1080-6bf77b674459f12ea01f2caf1a4fd10a.png",
+      "md5": "6bf77b674459f12ea01f2caf1a4fd10a",
+      "width": 1920,
+      "height": 1080,
+      "size": 478649,
+      "uploadedDate": "2021-03-29T11:05:03.975Z"
+    },
+    {
+      "type": "Screenshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Screenshot/075-GallaryActiveDevelopment-1920x1080-ea506486be54bcd2ab0553ac468642f9.png",
+      "md5": "ea506486be54bcd2ab0553ac468642f9",
+      "width": 1920,
+      "height": 1080,
+      "size": 345701,
+      "uploadedDate": "2021-03-29T11:05:04.443Z"
+    },
+    {
+      "type": "Thumbnail",
+      "url": "https://cdn1.epicgames.com/ue/product/Thumbnail/OpenLandGrassCustomizableGameReadyGrassSystem_thumb-284x284-9bb744d615cdabefff889183fc51fd56.png",
+      "md5": "9bb744d615cdabefff889183fc51fd56",
+      "width": 284,
+      "height": 284,
+      "size": 115108,
+      "uploadedDate": "2021-03-24T18:35:10.681Z"
+    },
+    {
+      "type": "Featured",
+      "url": "https://cdn1.epicgames.com/ue/product/Featured/OpenLandGrassCustomizableGameReadyGrassSystem_featured-894x488-d235520a5d3d3d65523d5fa6ba70ad9f.png",
+      "md5": "d235520a5d3d3d65523d5fa6ba70ad9f",
+      "width": 894,
+      "height": 488,
+      "size": 622418,
+      "uploadedDate": "2021-03-24T18:35:10.791Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/070-GallaryCommunity-1920x1080-6bf77b674459f12ea01f2caf1a4fd10a_Snapshot.png",
+      "md5": "0d2c0acf85932653dc2d3e452daa934a",
+      "width": 150,
+      "height": 74,
+      "size": 5249,
+      "uploadedDate": "2021-03-29T11:05:04.308Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/075-GallaryActiveDevelopment-1920x1080-ea506486be54bcd2ab0553ac468642f9_Snapshot.png",
+      "md5": "b44b511fd906fd966996ad25eecf9f72",
+      "width": 150,
+      "height": 74,
+      "size": 5218,
+      "uploadedDate": "2021-03-29T11:05:04.722Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/010-GallaryMultipleGrassTypes-1920x1080-bf5f6c5b148d54fa3ae772bcfd6c6143_Snapshot.png",
+      "md5": "736a57c88be0c3d626d6436614983913",
+      "width": 150,
+      "height": 74,
+      "size": 7821,
+      "uploadedDate": "2021-03-24T18:35:52.414Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/020-GallaryColorsVariations-1920x1080-dee28aaa1dcb0646ec780562af31d19c_Snapshot.png",
+      "md5": "d244062b372a1c7ec6d30510a445039c",
+      "width": 150,
+      "height": 74,
+      "size": 7046,
+      "uploadedDate": "2021-03-24T18:35:52.671Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/025-GallaryUseVariationMaps-1920x1080-ef2da27eb49f15d245f10aa1f8c5f9f3_Snapshot.png",
+      "md5": "17aa16f233e2e7bc582e721c4d33ecac",
+      "width": 150,
+      "height": 74,
+      "size": 8609,
+      "uploadedDate": "2021-03-24T18:35:53.044Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/030-GallaryRVTDistanceBlend-1920x1080-d0c7f3142f96afb4545e386a0be33a02_Snapshot.png",
+      "md5": "5f4bc06eca04c4e86cda44df2cd4a235",
+      "width": 150,
+      "height": 74,
+      "size": 6911,
+      "uploadedDate": "2021-03-24T18:35:53.255Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/040-GallaryRVTBottomBlend-1920x1080-4238463a01bfede8762ab16d1456aec9_Snapshot.png",
+      "md5": "7ad752688179ab2463e03b496819c25e",
+      "width": 150,
+      "height": 74,
+      "size": 7091,
+      "uploadedDate": "2021-03-24T18:35:53.484Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/050-GallaryRVTHideGrass-1920x1080-269200cbc98ce9d758e509cde40b540b_Snapshot.png",
+      "md5": "6bea1c9d88f588ae8d9b0a54eb012c29",
+      "width": 150,
+      "height": 74,
+      "size": 9655,
+      "uploadedDate": "2021-03-24T18:35:53.755Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/060-GallaryZOffsetBlending-1920x1080-85f6f3dce8ee953b8708a449e78666d1_Snapshot.png",
+      "md5": "159e626b2f0b26f1b1d6097930ea6afd",
+      "width": 150,
+      "height": 74,
+      "size": 6757,
+      "uploadedDate": "2021-03-24T18:35:54.106Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/070-GallaryGrassManager-1920x1080-2d0506a313f0a658aac6e94129960a14_Snapshot.png",
+      "md5": "9f16efd84997471e81868e6d1f5e2ba8",
+      "width": 150,
+      "height": 74,
+      "size": 7485,
+      "uploadedDate": "2021-03-24T18:35:54.274Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/080-GallaryBlueprintSupport-1920x1080-f54b9220de4ccb908c17e8e535f482bc_Snapshot.png",
+      "md5": "2f92a20727324bc79ec474b467f4237f",
+      "width": 150,
+      "height": 74,
+      "size": 5975,
+      "uploadedDate": "2021-03-24T18:35:54.438Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/090-GallaryOpenLandRVT-1920x1080-01a9ad4eae73754c8f0f8e667235dbcc_Snapshot.png",
+      "md5": "0aeec540c683137ad488cdbe4ac31926",
+      "width": 150,
+      "height": 74,
+      "size": 6451,
+      "uploadedDate": "2021-03-24T18:35:54.688Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/100-GallaryTinyLand-1920x1080-b149759074d87ac6838282e3d7740357_Snapshot.png",
+      "md5": "ee2482ea2342333612f1a39c7a57c271",
+      "width": 150,
+      "height": 74,
+      "size": 7468,
+      "uploadedDate": "2021-03-24T18:35:54.854Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/000-GallaryFeaturedImage-1920x1080-8c9637d843b1a1b7e4e98bf0b8f41165_Snapshot.png",
+      "md5": "0aa20fc7bddb9b1bf80eaae1412f1d65",
+      "width": 150,
+      "height": 74,
+      "size": 7340,
+      "uploadedDate": "2021-03-24T18:34:32.274Z"
+    },
+    {
+      "type": "Snapshot",
+      "url": "https://cdn1.epicgames.com/ue/product/Snapshot/GallaryFeaturedImage-1920x1080-03bc07818bd08194a827363e7da5ded3_Snapshot.png",
+      "md5": "04eb7a3b1891fb7cf23d85eef500389d",
+      "width": 150,
+      "height": 74,
+      "size": 7249,
+      "uploadedDate": "2021-03-22T23:04:41.219Z"
+    }
+  ],
+  "categories": [
+    {
+      "path": "assets"
+    },
+    {
+      "path": "assets/environments"
+    }
+  ],
+  "namespace": "ue",
+  "status": "ACTIVE",
+  "creationDate": "2021-03-24T18:46:11.364Z",
+  "lastModifiedDate": "2022-04-05T15:44:27.408Z",
+  "entitlementName": "00104b426d934f00a45792085d98e88f",
+  "entitlementType": "EXECUTABLE",
+  "itemType": "DURABLE",
+  "releaseInfo": [
+    {
+      "id": "fc704387caed4f2081b904e25b986b87",
+      "appId": "OpenLand00104b426d93V1",
+      "compatibleApps": [
+        "UE_4.26",
+        "UE_4.27",
+        "UE_5.0"
+      ],
+      "platform": [
+        "Win32",
+        "Windows",
+        "Xbox One",
+        "PS4",
+        "SteamVR / HTC Vive",
+        "Linux",
+        "HoloLens 2"
+      ],
+      "dateAdded": "2021-03-23T00:00:00.000Z",
+      "releaseNote": "",
+      "versionTitle": "OpenLandGrass-1.6.0"
+    }
+  ],
+  "developer": "ArunodaSusiripala",
+  "developerId": "o-nt3e99tu5v46knn37bjet2afgtac4x",
+  "endOfSupport": false,
+  "unsearchable": false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,3 +1,5 @@
+import fs from "fs";
+
 /**
  * This file is used specifically for security reasons.
  * Here you can access Nodejs stuff and inject functionality into
@@ -20,7 +22,9 @@ const fetch = require('node-fetch');
 // const util = require('util');
 // const exec = util.promisify(require('child_process').exec);
 const child = require('child_process')
+const {readdirSync} = require('fs')
 import {contextBridge, clipboard} from 'electron'
+import path from "path";
 
 
 let results
@@ -32,10 +36,34 @@ contextBridge.exposeInMainWorld('myNodeApi', {
     return new Promise(resolve => {
       sniffer.on('close', (code) => {
         results = clipboard.readText()
-       // launcher.kill('SIGTERM');
+        // launcher.kill('SIGTERM');
         resolve(results)
       });
     });
+  },
+
+  get_build_versions: (vault_cache_path) => {
+    let arrItems = []
+    fs.readdirSync(vault_cache_path, {withFileTypes: true})
+      .filter(dirent => dirent.isDirectory())
+      .forEach((element, index) => {
+        let item_data = {}
+        let file = path.join(vault_cache_path, element.name, 'manifest');
+        let data = fs.readFileSync(file);
+        let jsonData = JSON.parse(data.toString());
+        item_data.installed = false;
+        if (jsonData.CustomFields.InstallLocation) {
+          item_data.installed = true;
+          item_data.installed_location = jsonData.CustomFields.InstallLocation;
+        }
+        item_data.BuildVersionString = jsonData.BuildVersionString
+        item_data.AppNameString = jsonData.AppNameString
+        item_data.CatalogItemId = jsonData.CustomFields.CatalogItemId
+        item_data.CatalogAssetName = jsonData.CustomFields.CatalogAssetName
+        arrItems.push(item_data)
+      });
+
+    return arrItems
   },
 
   api_fetch: async (url, fetch_options) => {

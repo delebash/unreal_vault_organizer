@@ -53,7 +53,9 @@
              @click="filterByTags"
              color="primary"
              label="Filter Tags by"></q-btn>
+
     </div>
+
     <div class="col-auto justify-start">
       <q-select
         dense

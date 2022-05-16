@@ -59,6 +59,11 @@
                          :rules="[ val => val && val.length > 0 || 'Please type something']"
                 >
                 </q-input>
+                <q-input dense v-model="vault_cache_path" label="Vault Cache Path*" stack-label
+                         lazy-rules
+                         :rules="[ val => val && val.length > 0 || 'Please type something']"
+                >
+                </q-input>
                 <q-btn class="q-pt-none" dense @click="getToken()" color="primary"
                        label="GetToken"></q-btn>
 
@@ -92,6 +97,7 @@ export default {
     const $q = useQuasar()
     return {
       launcher_path: ref(''),
+      vault_cache_path: ref(''),
       sniffer_path: ref(''),
       isPwd: ref(true),
       selectedTab: ref('vault'),
@@ -112,26 +118,35 @@ export default {
       const dataArray = data.split(",");
       this.unreal_token = dataArray[0].toString()
       let url = dataArray[1].toString()
-      let tmpStr = url.match("v1/(.*)/s");
-      this.account_number = tmpStr[1];
 
+      if (url !== 'none'){
+        this.account_number = url.substring(
+          url.lastIndexOf("v1/") + 3,
+          url.lastIndexOf("/settings")
+        );
+      }
       await this.saveUserSettings()
     },
+    // if(this.account_number)
     async saveUserSettings() {
+
       await db.user_settings.put({
+        id: 1,
         account_number: this.account_number,
         unreal_token: this.unreal_token,
         sniffer_path: this.sniffer_path,
         launcher_path: this.launcher_path,
+        vault_cache_path: this.vault_cache_path
       })
     },
     async loadData() {
-      let user_settings = await db.user_settings.toCollection().first();
-      if (user_settings !== null) {
+      let user_settings = await db.user_settings.where("id").equals(1).first();
+      if (user_settings !== null  && user_settings !== undefined) {
         this.unreal_token = user_settings.unreal_token
         this.account_number = user_settings.account_number
         this.launcher_path = user_settings.launcher_path
         this.sniffer_path = user_settings.sniffer_path
+        this.vault_cache_path = user_settings.vault_cache_path
       }
     }
   }
