@@ -67,7 +67,7 @@
                 <q-btn class="q-pt-none" dense @click="getToken()" color="primary"
                        label="GetToken"></q-btn>
 
-                <q-btn class="q-pt-none" dense @click="saveUserSettings()" color="secondary"
+                <q-btn class="q-pt-none" dense @click="saveUserSettings()" color="positive"
                        label="Save settings"></q-btn>
               </div>
             </q-tab-panel>
@@ -107,9 +107,20 @@ export default {
   },
 
   mounted: async function () {
+    await this.loadColorPalette()
     await this.loadData()
   },
   methods: {
+    async loadColorPalette() {
+      let path = 'src/quasar-color-palatte.txt'
+      let arryColors = await window.myNodeApi.loadColorPalette(path)
+      for (let color of arryColors) {
+        await db.color_palette.put({
+          label: color.label,
+          value: color.value
+        })
+      }
+    },
     async getToken() {
       // let snifferPath = 'Fiddler.exe'
       // let launcherPath = 'F:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win64\EpicGamesLauncher.exe'
@@ -119,7 +130,7 @@ export default {
       this.unreal_token = dataArray[0].toString()
       let url = dataArray[1].toString()
 
-      if (url !== 'none'){
+      if (url !== 'none') {
         this.account_number = url.substring(
           url.lastIndexOf("v1/") + 3,
           url.lastIndexOf("/settings")
@@ -141,7 +152,7 @@ export default {
     },
     async loadData() {
       let user_settings = await db.user_settings.where("id").equals(1).first();
-      if (user_settings !== null  && user_settings !== undefined) {
+      if (user_settings !== null && user_settings !== undefined) {
         this.unreal_token = user_settings.unreal_token
         this.account_number = user_settings.account_number
         this.launcher_path = user_settings.launcher_path

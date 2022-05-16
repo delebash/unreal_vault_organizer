@@ -1,5 +1,5 @@
 <template>
-  <div id="menu" class="q-pa-xs text-h6 bg-primary text-white">Unreal Vault Organizer</div>
+  <div id="menu" class="q-pa-xs text-h6 bg-dark text-white">Unreal Vault Organizer</div>
   <div id="tag_item" class="q-pa-xs">Add new tags. Double click to edit.</div>
   <div class="row">
     <div class="col">
@@ -51,7 +51,7 @@
              dense
              size="19px"
              @click="filterByTags"
-             color="primary"
+             color="positive"
              label="Filter Tags by operator"></q-btn>
 
     </div>
@@ -138,14 +138,11 @@ export default {
       tag_edit: ref(false),
       tag_label: ref(''),
       tag_color: ref({}),
-      tag_color_options: ref([
-        {label: 'amber-5', value: 'amber-5'},
-        {label: 'red-11', value: 'red-11'},
-        {label: 'grey', value: 'grey'},
-      ]),
+      tag_color_options: ref([]),
     }
   },
   mounted: async function () {
+    this.tag_color_options = await db.color_palette.orderBy('label').toArray()
     await this.loadData()
   },
   methods: {

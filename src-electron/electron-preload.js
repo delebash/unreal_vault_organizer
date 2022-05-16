@@ -1,4 +1,3 @@
-import fs from "fs";
 
 /**
  * This file is used specifically for security reasons.
@@ -18,6 +17,7 @@ import fs from "fs";
  *   })
  */
 
+import fs from "fs";
 const fetch = require('node-fetch');
 // const util = require('util');
 // const exec = util.promisify(require('child_process').exec);
@@ -29,6 +29,28 @@ import path from "path";
 
 let results
 contextBridge.exposeInMainWorld('myNodeApi', {
+
+  loadColorPalette: (path) => {
+    console.log(path)
+    let arryColor = []
+
+    try {
+      // read contents of the file
+      const data = fs.readFileSync(path, 'UTF-8');
+      // split the contents by new line
+      const lines = data.split(/\r?\n/);
+      // print all lines
+      lines.forEach((line) => {
+        let  objColor = {}
+        objColor.label = line
+        objColor.value = line
+        arryColor.push(objColor)
+      });
+    } catch (err) {
+      console.error(err);
+    }
+    return arryColor
+  },
 
   launchSniffer: (snifferPath, launcherPath) => {
     const sniffer = child.spawn(snifferPath);
