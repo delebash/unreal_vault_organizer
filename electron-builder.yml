@@ -1,4 +1,4 @@
 appId: unreal_vault_organizer
 publish:
   provider: github
-  token: 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
+  token:
