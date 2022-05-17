@@ -28,3 +28,5 @@ yarn-error.log*
 *.njsproj
 *.sln
 !/electron-builder.yml
+electron-builder.yml
+/electron-builder.yml
