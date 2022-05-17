@@ -1,4 +1,4 @@
-# Unreal Vault Organizer using Electron (unreal_vault_organizer)
+# Unreal Vault Organizer using Electron 
 
 Organize your unreal vault plugins
 
