@@ -1,7 +1,6 @@
 .DS_Store
 .thumbs.db
 node_modules
-electron-builder.yml
 
 # Quasar core related directories
 .quasar
@@ -28,3 +27,4 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
+!/electron-builder.yml
