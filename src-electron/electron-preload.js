@@ -27,7 +27,6 @@ let results
 contextBridge.exposeInMainWorld('myNodeApi', {
 
   loadColorPalette: (path) => {
-    console.log(path)
     let arryColor = []
 
     try {

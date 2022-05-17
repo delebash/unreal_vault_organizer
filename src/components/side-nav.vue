@@ -143,7 +143,7 @@ export default {
   },
   mounted: async function () {
     this.tag_color_options = await db.color_palette.orderBy('label').toArray()
-    await this.loadData()
+   await this.loadData()
   },
   methods: {
     equalsIgnoreOrder(a, b) {

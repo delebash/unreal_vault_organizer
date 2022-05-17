@@ -83,7 +83,7 @@
 <script>
 
 import {ref} from 'vue'
-import {useQuasar} from 'quasar'
+import {useQuasar, Notify} from 'quasar'
 import SideNav from 'components/side-nav.vue';
 import {db} from '../db'
 
@@ -96,6 +96,7 @@ export default {
   setup() {
     const $q = useQuasar()
     return {
+      qt: $q,
       launcher_path: ref(''),
       vault_cache_path: ref(''),
       sniffer_path: ref(''),
@@ -150,6 +151,14 @@ export default {
         vault_cache_path: this.vault_cache_path
       })
     },
+    showNotify(msg, color, position, icon) {
+      this.qt.notify({
+        message: msg,
+        color: color,
+        position: position,
+        icon: icon
+      })
+    },
     async loadData() {
       let user_settings = await db.user_settings.where("id").equals(1).first();
       if (user_settings !== null && user_settings !== undefined) {
@@ -158,6 +167,8 @@ export default {
         this.launcher_path = user_settings.launcher_path
         this.sniffer_path = user_settings.sniffer_path
         this.vault_cache_path = user_settings.vault_cache_path
+      }else{
+        this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
       }
     }
   }

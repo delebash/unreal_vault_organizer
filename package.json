@@ -1,6 +1,6 @@
 {
   "name": "unreal_vault_organizer",
-  "version": "1.01",
+  "version": "1.00",
   "description": "Organize your unreal vault plugins",
   "productName": "Unreal Vault Organizer",
   "author": "daniel <danelebash@hotmail.com>",
@@ -8,6 +8,7 @@
   "repository": "https://github.com/delebash/unreal_vault_organizer",
   "scripts": {
     "start": "quasar dev -m electron",
+    "publish": "quasar build -m electron --debug -P always",
     "debug": "quasar dev --debug -m electron -t mat -- --remote-debugging-port=9222"
   },
   "dependencies": {
@@ -29,6 +30,7 @@
     "@quasar/app-vite": "^1.0.0-beta.14",
     "autoprefixer": "^10.4.7",
     "electron": "^18.2.3",
+    "electron-builder": "^22.14.13",
     "electron-packager": "^15.5.1"
   },
   "engines": {

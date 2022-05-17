@@ -36,7 +36,7 @@ import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import {db} from '../db';
 import {useQuasar, Notify} from 'quasar'
 
-let updates = false
+
 let fetch_options = {
   method: '',
   headers: {},
@@ -63,6 +63,7 @@ export default {
       isCancelBeforeStart,
       additional_row_info: [],
       build_versions: [],
+      updates: false,
       modules: [],
       qt: $q,
       vault_cache_path: '',
@@ -186,37 +187,39 @@ export default {
       this.gridApi.setRowData(args.rows);
     },
     async getVaultRows() {
-      this.qt.loading.show()
+
       let user_settings = await db.user_settings.where("id").equals(1).first();
-      this.unreal_token = user_settings.unreal_token
-      this.account_number = user_settings.account_number
-      this.vault_cache_path = user_settings.vault_cache_path
+      if (user_settings !== null && user_settings !== undefined) {
+        this.qt.loading.show()
+        this.unreal_token = user_settings.unreal_token
+        this.account_number = user_settings.account_number
+        this.vault_cache_path = user_settings.vault_cache_path
 
-      let catalog_url = 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/ue/bulk/items?includeDLCDetails=false&includeMainGameDetails=false&country=US&locale=en'
-      let entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/' + this.account_number + '/entitlements'
-      let count_params1 = '?start=0&count=5000'
-      // let count_params2 = '?start=1000&count=1000'
-      //Get list of entitlements for catalog query
-      entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/27966d5331e047a0a4e4b8ed06f3d0ef/entitlements'
-      let url = entitlement_url + count_params1
+        let catalog_url = 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/ue/bulk/items?includeDLCDetails=false&includeMainGameDetails=false&country=US&locale=en'
+        let entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/' + this.account_number + '/entitlements'
+        let count_params1 = '?start=0&count=5000'
+        // let count_params2 = '?start=1000&count=1000'
+        //Get list of entitlements for catalog query
+        entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/27966d5331e047a0a4e4b8ed06f3d0ef/entitlements'
+        let url = entitlement_url + count_params1
 
-      fetch_options.method = 'GET'
-      fetch_options.headers = {
-        'Authorization': this.unreal_token,
-        'Content-Type': 'application/json'
-      }
+        fetch_options.method = 'GET'
+        fetch_options.headers = {
+          'Authorization': this.unreal_token,
+          'Content-Type': 'application/json'
+        }
 
-      let entitlements = await window.myNodeApi.api_fetch(url, fetch_options)
-
-      if (Array.isArray(entitlements) === true) {
-        let assets = await window.myNodeApi.api_fetch('https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/public/assets/Windows?label=Live', fetch_options)
-        await this.getCatalogItems(catalog_url, entitlements, assets)
+        let entitlements = await window.myNodeApi.api_fetch(url, fetch_options)
+        if (Array.isArray(entitlements) === true) {
+          let assets = await window.myNodeApi.api_fetch('https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/public/assets/Windows?label=Live', fetch_options)
+          await this.getCatalogItems(catalog_url, entitlements, assets)
+        } else {
+          this.qt.loading.hide()
+          this.showNotify('Please request a new token', 'negative', 'top', 'report_problem')
+        }
       } else {
-        this.qt.loading.hide()
-        this.showNotify('Please request a new token', 'negative', 'top', 'report_problem')
+        this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
       }
-
-
     },
     async getCatalogItems(catalog_url, entitlements, assets) {
       let start = 0, entitlements_length = entitlements.length || [], response, form_body = '',
@@ -274,9 +277,12 @@ export default {
       }
       this.qt.loading.hide()
       await this.loadGrid();
+      if (this.updates === true) {
+        this.showNotify('Updates available', 'secondary', 'top')
+      }
     },
     async loadGrid() {
-     // this.qt.loading.show()
+      // this.qt.loading.show()
       let user_settings = await db.user_settings.where("id").equals(1).first();
       this.unreal_token = user_settings.unreal_token
       this.account_number = user_settings.account_number
@@ -285,24 +291,22 @@ export default {
       this.build_versions = await window.myNodeApi.get_build_versions(this.vault_cache_path)
 
       let catalogItems = await db.vault_library.toArray()
-      updates = false
+      this.updates = false
       this.rowData = await Promise.all(catalogItems.map(async catalogItem => {
         catalogItem.tags = await db.tags.where('id').anyOf([1]).toArray()
         catalogItem.updates_available = await this.getVaultUpdates(catalogItem)
         return catalogItem
       }));
 
-      if (updates === true){
-        this.showNotify('Updates available', 'secondary', 'top')
-      }
-   //   this.qt.loading.hide()
+
+      //   this.qt.loading.hide()
     },
     async getVaultUpdates(catalogItem) {
 
       for (let build of this.build_versions) {
         if (catalogItem.catalogItemId === build.CatalogItemId) {
           if (catalogItem.buildVersion !== build.BuildVersionString) {
-            updates = true
+            this.updates = true
             return '1'
           } else {
             return '0'
