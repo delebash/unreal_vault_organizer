@@ -19,13 +19,9 @@
 
 import fs from "fs";
 const fetch = require('node-fetch');
-// const util = require('util');
-// const exec = util.promisify(require('child_process').exec);
 const child = require('child_process')
-const {readdirSync} = require('fs')
 import {contextBridge, clipboard} from 'electron'
 import path from "path";
-
 
 let results
 contextBridge.exposeInMainWorld('myNodeApi', {
@@ -102,7 +98,6 @@ contextBridge.exposeInMainWorld('myNodeApi', {
         headers: fetch_options.headers
       });
     }
-
 
     let json = await response.json();
     return json

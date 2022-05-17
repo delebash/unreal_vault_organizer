@@ -75,8 +75,6 @@ function createWindow () {
   // This is the actual solution
   mainWindow.webContents.on("new-window", function(event, url) {
     event.preventDefault();
-    // com.epicgames.launcher://ue/marketplace/item/
-    console.log(url)
     shell.openExternal(url);
   });
 

@@ -1,10 +1,11 @@
 {
   "name": "unreal_vault_organizer",
-  "version": "1.00",
+  "version": "1.01",
   "description": "Organize your unreal vault plugins",
   "productName": "Unreal Vault Organizer",
   "author": "daniel <danelebash@hotmail.com>",
   "private": true,
+  "repository": "https://github.com/delebash/unreal_vault_organizer",
   "scripts": {
     "start": "quasar dev -m electron",
     "debug": "quasar dev --debug -m electron -t mat -- --remote-debugging-port=9222"
@@ -16,6 +17,7 @@
     "ag-grid-vue3": "^27.2.1",
     "dexie": "^3.2.2",
     "electron-context-menu": "^3.1.2",
+    "electron-updater": "^5.0.1",
     "mitt": "^3.0.0",
     "node-fetch": "^2.6.7",
     "quasar": "^2.6.6",
