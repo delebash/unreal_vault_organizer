@@ -24,7 +24,6 @@ contextMenu({
   showCopyImageAddress: true,
 });
 
-
 let mainWindow
 
 function createWindow () {
@@ -48,7 +47,7 @@ function createWindow () {
   defaultMenu.items
     .filter(x => x.role != 'help')
     .forEach(x => {
-      if(x.role == 'viewmenu' && process.env.NODE_ENV == 'production') {
+      // if(x.role == 'viewmenu' && process.env.NODE_ENV == 'production') {
         // let newSubmenu = new Menu();
         //
         // x.submenu.items.filter(y => y.role != 'toggledevtools').forEach(y => newSubmenu.append(y));
@@ -62,9 +61,9 @@ function createWindow () {
         //     submenu: newSubmenu
         //   })
         // );
-      } else {
+      // } else {
         newMenu.append(x);
-      }
+      // }
     })
 
   Menu.setApplicationMenu(newMenu);
