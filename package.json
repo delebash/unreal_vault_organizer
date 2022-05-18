@@ -18,6 +18,7 @@
     "ag-grid-vue3": "^27.2.1",
     "dexie": "^3.2.2",
     "electron-context-menu": "^3.1.2",
+    "electron-log": "^4.4.7",
     "electron-updater": "^5.0.1",
     "mitt": "^3.0.0",
     "node-fetch": "^2.6.7",

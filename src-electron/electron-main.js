@@ -1,16 +1,33 @@
-import { app, BrowserWindow, nativeTheme, Menu, MenuItem , shell} from 'electron'
+import {app, BrowserWindow, nativeTheme, Menu, MenuItem, shell} from 'electron'
+
 const contextMenu = require('electron-context-menu');
 import path from 'path'
 import os from 'os'
 
+const {autoUpdater} = require('electron-updater');
+const log = require('electron-log');
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform()
+
+//-------------------------------------------------------------------
+// Logging
+//
+// THIS SECTION IS NOT REQUIRED
+//
+// This logging setup is not required for auto-updates to work,
+// but it sure makes debugging easier :)
+//-------------------------------------------------------------------
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+log.info('App starting...');
+
 
 try {
   if (platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
     require('fs').unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'))
   }
-} catch (_) { }
+} catch (_) {
+}
 
 
 contextMenu({
@@ -26,7 +43,7 @@ contextMenu({
 
 let mainWindow
 
-function createWindow () {
+function createWindow() {
   /**
    * Initial window options
    */
@@ -41,38 +58,134 @@ function createWindow () {
       preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD)
     }
   })
-  let defaultMenu = Menu.getApplicationMenu()
+//   let defaultMenu = Menu.getApplicationMenu()
+//
+//   let newMenu = new Menu();
+//   defaultMenu.items
+//     .filter(x => x.role != 'help')
+//     .forEach(x => {
+//         // if(x.role == 'viewmenu' && process.env.NODE_ENV == 'production') {
+//         //   let newSubmenu = new Menu();
+//         //   //
+//         //   // x.submenu.items.filter(y => y.role != 'toggledevtools').forEach(y => newSubmenu.append(y));
+//         //   //
+//         //   x.submenu = newSubmenu;
+//         //   //
+//         //   newMenu.append(
+//         //     new MenuItem({
+//         //       type: x.type,
+//         //       label: x.label,
+//         //       submenu: newSubmenu
+//         //     })
+//         //   );
+//         // } else {
+//         newMenu.append(x);
+//         // }
+//       }
+//     )
+//
+// // // Add help
+//   newMenu.append(
+//     new MenuItem({
+//       type: 'submenu',
+//       label: 'dsrgsdfgsdfg'
+//     })
+//   )
+  const name = app.getName();
+  const template = [
+    {
+      label: 'File',
+      submenu: [
+        {
+          role: 'quit'
+        }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        {
+          role: 'undo'
+        },
+        {
+          role: 'redo'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'cut'
+        },
+        {
+          role: 'copy'
+        },
+        {
+          role: 'paste'
+        }
+      ]
+    },
 
-  let newMenu = new Menu();
-  defaultMenu.items
-    .filter(x => x.role != 'help')
-    .forEach(x => {
-      // if(x.role == 'viewmenu' && process.env.NODE_ENV == 'production') {
-        // let newSubmenu = new Menu();
-        //
-        // x.submenu.items.filter(y => y.role != 'toggledevtools').forEach(y => newSubmenu.append(y));
-        //
-        // x.submenu = newSubmenu;
-        //
-        // newMenu.append(
-        //   new MenuItem({
-        //     type: x.type,
-        //     label: x.label,
-        //     submenu: newSubmenu
-        //   })
-        // );
-      // } else {
-        newMenu.append(x);
-      // }
-    })
+    {
+      label: 'View',
+      submenu: [
+        {
+          role: 'reload'
+        },
+        {
+          role: 'toggledevtools'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'resetzoom'
+        },
+        {
+          role: 'zoomin'
+        },
+        {
+          role: 'zoomout'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'togglefullscreen'
+        }
+      ]
+    },
 
-  Menu.setApplicationMenu(newMenu);
+    {
+      role: 'window',
+      submenu: [
+        {
+          role: 'minimize'
+        },
+        {
+          role: 'close'
+        }
+      ]
+    },
+
+    {
+      role: 'help',
+      submenu: [
+        {
+          label: 'About',
+          role: 'about'
+        },
+      ]
+    }
+  ]
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
+
 
   //mainWindow.setMenu(null);
   mainWindow.loadURL(process.env.APP_URL)
 
   // This is the actual solution
-  mainWindow.webContents.on("new-window", function(event, url) {
+  mainWindow.webContents.on("new-window", function (event, url) {
     event.preventDefault();
     shell.openExternal(url);
   });

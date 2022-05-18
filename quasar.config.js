@@ -192,6 +192,21 @@ module.exports = configure(function (/* ctx */) {
         appId: 'unreal_vault_organizer',
         publish: {
           'provider': 'github'
+        },
+        directories: {
+          output: "release", // the location of the packed file
+          app: ". /" // start location
+        },
+        win: {// configuration parameters of installation software under Windows
+          target: [
+            "NSIS", // package as NSIS installation file
+            "Zip" // package as the installation file zip
+          ]
+        },
+        nsis: {// NSIS configuration parameters
+          oneClick : false, // click to open
+          allowToChangeInstallationDirectory : true, // allows the user to choose the installation location
+          perMachine : true
         }
       }
     },
