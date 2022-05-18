@@ -1,4 +1,4 @@
-import {app, BrowserWindow, nativeTheme, Menu, MenuItem, shell} from 'electron'
+import {app, BrowserWindow, nativeTheme, Menu, ipcMain, shell, ipcRenderer} from 'electron'
 
 const contextMenu = require('electron-context-menu');
 import path from 'path'
@@ -9,14 +9,6 @@ const log = require('electron-log');
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform()
 
-//-------------------------------------------------------------------
-// Logging
-//
-// THIS SECTION IS NOT REQUIRED
-//
-// This logging setup is not required for auto-updates to work,
-// but it sure makes debugging easier :)
-//-------------------------------------------------------------------
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
@@ -28,7 +20,6 @@ try {
   }
 } catch (_) {
 }
-
 
 contextMenu({
   showSaveImageAs: true,
@@ -42,7 +33,90 @@ contextMenu({
 });
 
 let mainWindow
+const template = [
+  {
+    label: 'File',
+    submenu: [
+      {
+        role: 'quit'
+      }
+    ]
+  },
+  {
+    label: 'Edit',
+    submenu: [
+      {
+        role: 'undo'
+      },
+      {
+        role: 'redo'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        role: 'cut'
+      },
+      {
+        role: 'copy'
+      },
+      {
+        role: 'paste'
+      }
+    ]
+  },
 
+  {
+    label: 'View',
+    submenu: [
+      {
+        role: 'reload'
+      },
+      {
+        role: 'toggledevtools'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        role: 'resetzoom'
+      },
+      {
+        role: 'zoomin'
+      },
+      {
+        role: 'zoomout'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        role: 'togglefullscreen'
+      }
+    ]
+  },
+
+  {
+    role: 'window',
+    submenu: [
+      {
+        role: 'minimize'
+      },
+      {
+        role: 'close'
+      }
+    ]
+  },
+  {
+    role: 'help',
+    submenu: [
+      {
+        label: 'About',
+        role: 'about'
+      },
+    ]
+  }
+]
 function createWindow() {
   /**
    * Initial window options
@@ -58,130 +132,10 @@ function createWindow() {
       preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD)
     }
   })
-//   let defaultMenu = Menu.getApplicationMenu()
-//
-//   let newMenu = new Menu();
-//   defaultMenu.items
-//     .filter(x => x.role != 'help')
-//     .forEach(x => {
-//         // if(x.role == 'viewmenu' && process.env.NODE_ENV == 'production') {
-//         //   let newSubmenu = new Menu();
-//         //   //
-//         //   // x.submenu.items.filter(y => y.role != 'toggledevtools').forEach(y => newSubmenu.append(y));
-//         //   //
-//         //   x.submenu = newSubmenu;
-//         //   //
-//         //   newMenu.append(
-//         //     new MenuItem({
-//         //       type: x.type,
-//         //       label: x.label,
-//         //       submenu: newSubmenu
-//         //     })
-//         //   );
-//         // } else {
-//         newMenu.append(x);
-//         // }
-//       }
-//     )
-//
-// // // Add help
-//   newMenu.append(
-//     new MenuItem({
-//       type: 'submenu',
-//       label: 'dsrgsdfgsdfg'
-//     })
-//   )
-  const name = app.getName();
-  const template = [
-    {
-      label: 'File',
-      submenu: [
-        {
-          role: 'quit'
-        }
-      ]
-    },
-    {
-      label: 'Edit',
-      submenu: [
-        {
-          role: 'undo'
-        },
-        {
-          role: 'redo'
-        },
-        {
-          type: 'separator'
-        },
-        {
-          role: 'cut'
-        },
-        {
-          role: 'copy'
-        },
-        {
-          role: 'paste'
-        }
-      ]
-    },
 
-    {
-      label: 'View',
-      submenu: [
-        {
-          role: 'reload'
-        },
-        {
-          role: 'toggledevtools'
-        },
-        {
-          type: 'separator'
-        },
-        {
-          role: 'resetzoom'
-        },
-        {
-          role: 'zoomin'
-        },
-        {
-          role: 'zoomout'
-        },
-        {
-          type: 'separator'
-        },
-        {
-          role: 'togglefullscreen'
-        }
-      ]
-    },
-
-    {
-      role: 'window',
-      submenu: [
-        {
-          role: 'minimize'
-        },
-        {
-          role: 'close'
-        }
-      ]
-    },
-
-    {
-      role: 'help',
-      submenu: [
-        {
-          label: 'About',
-          role: 'about'
-        },
-      ]
-    }
-  ]
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 
-
-  //mainWindow.setMenu(null);
   mainWindow.loadURL(process.env.APP_URL)
 
   // This is the actual solution
@@ -203,6 +157,10 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+
+  mainWindow.once('ready-to-show', () => {
+   autoUpdater.checkForUpdates();
+  });
 }
 
 app.whenReady().then(createWindow)
@@ -218,3 +176,43 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+ipcMain.on("toMain", (event, data) => {
+  // Send result back to renderer process
+ // mainWindow.webContents.send("fromMain", 'jjjj');
+  if(data.event === 'restart'){
+    autoUpdater.quitAndInstall();
+  }
+})
+
+//Auto Updater
+autoUpdater.on('checking-for-update', () => {
+  sendStatusToWindow({event:'checking-for-update', msg:'Checking for update...'});
+})
+autoUpdater.on('update-available', (info) => {
+  sendStatusToWindow({event:'update-available', msg:'update-available'});
+})
+autoUpdater.on('update-not-available', (info) => {
+  sendStatusToWindow({event:'update-not-available', msg:'update-not-available'});
+})
+autoUpdater.on('error', (err) => {
+  sendStatusToWindow({event:'error', msg:'Error in auto-updater. ' + err});
+})
+autoUpdater.on('download-progress', (progressObj) => {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+  sendStatusToWindow({event:'download-progress', msg:log_message});
+})
+autoUpdater.on('update-downloaded', (info) => {
+  sendStatusToWindow({event:'update-downloaded', msg:'Update downloaded'});
+})
+
+function sendStatusToWindow(data) {
+  log.info(data.text);
+  mainWindow.webContents.send('fromMain', data);
+}
+//
+// ipcMain.on('restart_app', () => {
+//
+// });

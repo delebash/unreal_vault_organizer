@@ -1,4 +1,3 @@
-
 /**
  * This file is used specifically for security reasons.
  * Here you can access Nodejs stuff and inject functionality into
@@ -18,33 +17,27 @@
  */
 
 import fs from "fs";
+
 const fetch = require('node-fetch');
 const child = require('child_process')
-import {contextBridge, clipboard} from 'electron'
+import {contextBridge, clipboard, ipcRenderer} from 'electron'
 import path from "path";
 
 let results
+
 contextBridge.exposeInMainWorld('myNodeApi', {
-
-  loadColorPalette: (path) => {
-    let arryColor = []
-
-    try {
-      // read contents of the file
-      const data = fs.readFileSync(path, 'UTF-8');
-      // split the contents by new line
-      const lines = data.split(/\r?\n/);
-      // print all lines
-      lines.forEach((line) => {
-        let  objColor = {}
-        objColor.label = line
-        objColor.value = line
-        arryColor.push(objColor)
-      });
-    } catch (err) {
-      console.error(err);
+  send: (channel, data) => {
+    let validChannels = ["toMain"]
+    if (validChannels.includes(channel)) {
+      ipcRenderer.send(channel, data);
     }
-    return arryColor
+  },
+  receive: (channel, func) => {
+    let validChannels = ["fromMain"];
+    if (validChannels.includes(channel)) {
+      // Strip event as it includes `sender` and is a security risk
+      ipcRenderer.on(channel, (event, ...args) => func(...args));
+    }
   },
 
   launchSniffer: (snifferPath, launcherPath) => {
@@ -58,7 +51,6 @@ contextBridge.exposeInMainWorld('myNodeApi', {
       });
     });
   },
-
   get_build_versions: (vault_cache_path) => {
     let arrItems = []
     fs.readdirSync(vault_cache_path, {withFileTypes: true})
@@ -82,7 +74,6 @@ contextBridge.exposeInMainWorld('myNodeApi', {
 
     return arrItems
   },
-
   api_fetch: async (url, fetch_options) => {
     let response
     if (fetch_options.method === 'POST') {
@@ -97,9 +88,7 @@ contextBridge.exposeInMainWorld('myNodeApi', {
         headers: fetch_options.headers
       });
     }
-
     let json = await response.json();
     return json
-
   }
 })

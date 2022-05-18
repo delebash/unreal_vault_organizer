@@ -1,11 +1,16 @@
 <template>
   <div id="app">
-
-    <q-btn class="q-pt-none" dense @click="getVaultRows" color="primary"
-           label="Download Vault"></q-btn>
-    ---
     <q-btn class="q-pt-none" dense @click="loadGrid" color="deep-orange-12"
            label="Refresh Grid"></q-btn>
+    ---
+    <q-btn class="q-pt-none" dense @click="getVaultRows" color="primary"
+           label="Download Vault"></q-btn>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <q-chip v-show="updates" color="yellow-9" text-color="white">
+      Updates Available
+    </q-chip>
+
+
     <ag-grid-vue
       style="width: 100%; height: 94%;"
       class="ag-theme-alpine"
@@ -187,7 +192,6 @@ export default {
       this.gridApi.setRowData(args.rows);
     },
     async getVaultRows() {
-
       let user_settings = await db.user_settings.where("id").equals(1).first();
       if (user_settings !== null && user_settings !== undefined) {
         this.qt.loading.show()
@@ -291,18 +295,14 @@ export default {
       this.build_versions = await window.myNodeApi.get_build_versions(this.vault_cache_path)
 
       let catalogItems = await db.vault_library.toArray()
-      this.updates = false
       this.rowData = await Promise.all(catalogItems.map(async catalogItem => {
         catalogItem.tags = await db.tags.where('id').anyOf([1]).toArray()
         catalogItem.updates_available = await this.getVaultUpdates(catalogItem)
         return catalogItem
       }));
-
-
       //   this.qt.loading.hide()
     },
     async getVaultUpdates(catalogItem) {
-
       for (let build of this.build_versions) {
         if (catalogItem.catalogItemId === build.CatalogItemId) {
           if (catalogItem.buildVersion !== build.BuildVersionString) {

@@ -86,8 +86,7 @@ import {ref} from 'vue'
 import {useQuasar, Notify} from 'quasar'
 import SideNav from 'components/side-nav.vue';
 import {db} from '../db'
-
-let refresh_grid_options = {}
+import {color_palette} from '../quasar-color-palatte.js'
 
 export default {
   components: {
@@ -108,17 +107,29 @@ export default {
   },
 
   mounted: async function () {
+
+    window.myNodeApi.receive("fromMain", (data) => {
+      if (data.event === 'update-downloaded') {
+        let actions = [
+          {
+            label: 'Restart Now?', color: 'white', handler: () => {
+              console.log('test')
+              window.myNodeApi.send("toMain", {event: 'restart', msg: ''});
+            }
+          }
+        ]
+        this.showNotify('Update downloaded, ready to restart and install.', 'info', 'top', 'announcement', actions)
+      }
+    });
     await this.loadColorPalette()
     await this.loadData()
   },
   methods: {
     async loadColorPalette() {
-      let path = 'src/quasar-color-palatte.txt'
-      let arryColors = await window.myNodeApi.loadColorPalette(path)
-      for (let color of arryColors) {
+      for (let color of color_palette) {
         await db.color_palette.put({
-          label: color.label,
-          value: color.value
+          label: color,
+          value: color
         })
       }
     },
@@ -151,12 +162,13 @@ export default {
         vault_cache_path: this.vault_cache_path
       })
     },
-    showNotify(msg, color, position, icon) {
+    showNotify(msg, color, position, icon, actions) {
       this.qt.notify({
         message: msg,
         color: color,
         position: position,
-        icon: icon
+        icon: icon,
+        actions: actions
       })
     },
     async loadData() {
@@ -167,7 +179,7 @@ export default {
         this.launcher_path = user_settings.launcher_path
         this.sniffer_path = user_settings.sniffer_path
         this.vault_cache_path = user_settings.vault_cache_path
-      }else{
+      } else {
         this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
       }
     }

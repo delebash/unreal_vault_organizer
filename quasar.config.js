@@ -195,7 +195,6 @@ module.exports = configure(function (/* ctx */) {
         },
         directories: {
           output: "release", // the location of the packed file
-          app: ". /" // start location
         },
         win: {// configuration parameters of installation software under Windows
           target: [
@@ -205,6 +204,7 @@ module.exports = configure(function (/* ctx */) {
         },
         nsis: {// NSIS configuration parameters
           oneClick : false, // click to open
+          deleteAppDataOnUninstall: true,
           allowToChangeInstallationDirectory : true, // allows the user to choose the installation location
           perMachine : true
         }

@@ -1,5 +1,5 @@
 <template>
-  <div id="menu" class="q-pa-xs text-h6 bg-dark text-white">Unreal Vault Organizer</div>
+  <div id="menu" class="q-pa-xs text-h6 bg-primary text-white">Unreal Vault Organizer</div>
   <div id="tag_item" class="q-pa-xs">Add new tags. Double click to edit.</div>
   <div class="row">
     <div class="col">

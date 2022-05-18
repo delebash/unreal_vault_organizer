@@ -1,38 +1,42 @@
 {
   "name": "unreal_vault_organizer",
-  "version": "1.0.3",
+  "version": "1.2.0",
   "description": "Organize your unreal vault plugins",
   "productName": "Unreal Vault Organizer",
   "author": "daniel <danelebash@hotmail.com>",
   "private": true,
-  "repository": "https://github.com/delebash/unreal_vault_organizer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/delebash/unreal_vault_organizer"
+  },
   "scripts": {
     "start": "quasar dev -m electron",
+    "build": "quasar build --debug -m electron",
     "publish": "quasar build --debug -m electron -P always",
     "debug": "quasar dev --debug -m electron -t mat -- --remote-debugging-port=9222"
   },
   "dependencies": {
-    "@quasar/extras": "^1.13.6",
+    "@quasar/extras": "^1.14.0",
+    "@vueuse/core": "^8.5.0",
     "@vueuse/rxjs": "^8.5.0",
-    "ag-grid-community": "^27.2.1",
-    "ag-grid-vue3": "^27.2.1",
+    "ag-grid-community": "^27.3.0",
+    "ag-grid-vue3": "^27.3.0",
     "dexie": "^3.2.2",
     "electron-context-menu": "^3.1.2",
     "electron-log": "^4.4.7",
-    "electron-updater": "^5.0.1",
+    "electron-updater": "^5.0.4",
     "mitt": "^3.0.0",
-    "node-fetch": "^2.6.7",
-    "quasar": "^2.6.6",
+    "node-fetch": "2.6.7",
+    "quasar": "^2.7.0",
     "rxjs": "^7.5.5",
     "vue": "^3.2.33",
     "vue-router": "^4.0.15"
   },
   "devDependencies": {
-    "@quasar/app-vite": "^1.0.0-beta.14",
+    "@quasar/app-vite": "^1.0.0",
     "autoprefixer": "^10.4.7",
-    "electron": "^18.2.3",
-    "electron-builder": "^22.14.13",
-    "electron-packager": "^15.5.1"
+    "electron": "^18.2.4",
+    "electron-builder": "^23.0.3"
   },
   "engines": {
     "node": "^18 || ^16 || ^14.19",
