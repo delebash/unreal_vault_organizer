@@ -286,21 +286,26 @@ export default {
       }
     },
     async loadGrid() {
-      // this.qt.loading.show()
       let user_settings = await db.user_settings.where("id").equals(1).first();
-      this.unreal_token = user_settings.unreal_token
-      this.account_number = user_settings.account_number
-      this.vault_cache_path = user_settings.vault_cache_path
+      if (user_settings !== null && user_settings !== undefined) {
+        this.unreal_token = user_settings.unreal_token
+        this.account_number = user_settings.account_number
+        this.launcher_path = user_settings.launcher_path
+        this.sniffer_path = user_settings.sniffer_path
+        this.vault_cache_path = user_settings.vault_cache_path
 
-      this.build_versions = await window.myNodeApi.get_build_versions(this.vault_cache_path)
+        this.build_versions = await window.myNodeApi.get_build_versions(this.vault_cache_path)
 
-      let catalogItems = await db.vault_library.toArray()
-      this.rowData = await Promise.all(catalogItems.map(async catalogItem => {
-        catalogItem.tags = await db.tags.where('id').anyOf([1]).toArray()
-        catalogItem.updates_available = await this.getVaultUpdates(catalogItem)
-        return catalogItem
-      }));
-      //   this.qt.loading.hide()
+        let catalogItems = await db.vault_library.toArray()
+        this.rowData = await Promise.all(catalogItems.map(async catalogItem => {
+          catalogItem.tags = await db.tags.where('id').anyOf([1]).toArray()
+          catalogItem.updates_available = await this.getVaultUpdates(catalogItem)
+          return catalogItem
+        }));
+        //   this.qt.loading.hide()
+      } else {
+        this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
+      }
     },
     async getVaultUpdates(catalogItem) {
       for (let build of this.build_versions) {

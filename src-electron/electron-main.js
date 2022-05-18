@@ -117,6 +117,7 @@ const template = [
     ]
   }
 ]
+
 function createWindow() {
   /**
    * Initial window options
@@ -159,7 +160,7 @@ function createWindow() {
   })
 
   mainWindow.once('ready-to-show', () => {
-   autoUpdater.checkForUpdates();
+    autoUpdater.checkForUpdates();
   });
 }
 
@@ -179,39 +180,40 @@ app.on('activate', () => {
 
 ipcMain.on("toMain", (event, data) => {
   // Send result back to renderer process
- // mainWindow.webContents.send("fromMain", 'jjjj');
-  if(data.event === 'restart'){
+  // mainWindow.webContents.send("fromMain", 'jjjj');
+  if (data.event === 'restart') {
     autoUpdater.quitAndInstall();
   }
 })
 
 //Auto Updater
 autoUpdater.on('checking-for-update', () => {
-  sendStatusToWindow({event:'checking-for-update', msg:'Checking for update...'});
+  sendStatusToWindow({event: 'checking-for-update', msg: 'Checking for update...'});
 })
 autoUpdater.on('update-available', (info) => {
-  sendStatusToWindow({event:'update-available', msg:'update-available'});
+  sendStatusToWindow({event: 'update-available', msg: 'update-available'});
 })
 autoUpdater.on('update-not-available', (info) => {
-  sendStatusToWindow({event:'update-not-available', msg:'update-not-available'});
+  sendStatusToWindow({event: 'update-not-available', msg: 'update-not-available'});
 })
 autoUpdater.on('error', (err) => {
-  sendStatusToWindow({event:'error', msg:'Error in auto-updater. ' + err});
+  sendStatusToWindow({event: 'error', msg: 'Error in auto-updater. ' + err});
 })
 autoUpdater.on('download-progress', (progressObj) => {
   let log_message = "Download speed: " + progressObj.bytesPerSecond;
   log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
   log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-  sendStatusToWindow({event:'download-progress', msg:log_message});
+  sendStatusToWindow({event: 'download-progress', msg: log_message});
 })
 autoUpdater.on('update-downloaded', (info) => {
-  sendStatusToWindow({event:'update-downloaded', msg:'Update downloaded'});
+  sendStatusToWindow({event: 'update-downloaded', msg: 'Update downloaded'});
 })
 
 function sendStatusToWindow(data) {
-  log.info(data.text);
+  log.info(data.msg);
   mainWindow.webContents.send('fromMain', data);
 }
+
 //
 // ipcMain.on('restart_app', () => {
 //

@@ -109,11 +109,11 @@ export default {
   mounted: async function () {
 
     window.myNodeApi.receive("fromMain", (data) => {
+      console.log(data.msg)
       if (data.event === 'update-downloaded') {
         let actions = [
           {
             label: 'Restart Now?', color: 'white', handler: () => {
-              console.log('test')
               window.myNodeApi.send("toMain", {event: 'restart', msg: ''});
             }
           }
