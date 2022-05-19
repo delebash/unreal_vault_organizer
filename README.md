@@ -2,6 +2,10 @@
 
 Organize your unreal vault plugins
 
+Intro video: https://youtu.be/ywnvcVgiW3o
+
+Installation instructions video: https://youtu.be/6KvpvTTTg70 
+
 ## Install the dependencies
 ```bash
 npm install
@@ -18,7 +22,7 @@ A simple application that downloads your unreal vault inventory and allows you t
 
 Please watch video for installation instructions.  You will need to install the free version of <a href="https://www.telerik.com/fiddler/fiddler-classic" target="_blank">Fiddler Classic</a> from Telerik.
 
-Setup instructions video coming soon.
+
 
 
 Screen shots:
