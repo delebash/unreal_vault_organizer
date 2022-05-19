@@ -128,7 +128,6 @@ function createWindow() {
     height: 600,
     useContentSize: true,
     icon: path.join(__dirname, 'icons/icon.ico'),
-    autoHideMenuBar: true,
     center: true,
     webPreferences: {
       contextIsolation: true,
