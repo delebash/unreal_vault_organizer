@@ -1,8 +1,8 @@
 <template>
   <q-page class="flex flex-center">
     <img
-      alt="Quasar logo"
-      src="~assets/quasar-logo-vertical.svg"
+      alt="Unreal Vault Organizer logo"
+      src="~assets/logo.png"
       style="width: 200px; height: 200px"
     >
   </q-page>

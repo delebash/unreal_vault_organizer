@@ -180,7 +180,7 @@ export default {
         this.sniffer_path = user_settings.sniffer_path
         this.vault_cache_path = user_settings.vault_cache_path
       } else {
-        this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
+       // this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
       }
     }
   }

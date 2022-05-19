@@ -83,8 +83,8 @@ module.exports = configure(function (/* ctx */) {
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
       config: {
-        loading: { /* look at QuasarConfOptions from the API card */ },
-        notify: { /* look at QuasarConfOptions from the API card */ }
+        loading: { /* look at QuasarConfOptions from the API card */},
+        notify: { /* look at QuasarConfOptions from the API card */}
       },
 
       // iconSet: 'material-icons', // Quasar icon set
@@ -193,9 +193,6 @@ module.exports = configure(function (/* ctx */) {
         publish: {
           'provider': 'github'
         },
-        directories: {
-          output: "release", // the location of the packed file
-        },
         win: {// configuration parameters of installation software under Windows
           target: [
             "NSIS", // package as NSIS installation file
@@ -203,10 +200,10 @@ module.exports = configure(function (/* ctx */) {
           ]
         },
         nsis: {// NSIS configuration parameters
-          oneClick : false, // click to open
+          oneClick: false, // click to open
           deleteAppDataOnUninstall: true,
-          allowToChangeInstallationDirectory : true, // allows the user to choose the installation location
-          perMachine : true
+          allowToChangeInstallationDirectory: true, // allows the user to choose the installation location
+          perMachine: true
         }
       }
     },

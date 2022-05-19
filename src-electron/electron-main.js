@@ -1,4 +1,4 @@
-import {app, BrowserWindow, nativeTheme, Menu, ipcMain, shell, ipcRenderer} from 'electron'
+import {app, BrowserWindow, nativeTheme, Menu, ipcMain, shell, Tray} from 'electron'
 
 const contextMenu = require('electron-context-menu');
 import path from 'path'
@@ -13,6 +13,7 @@ autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
 
+let tray = null;
 
 try {
   if (platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -123,10 +124,12 @@ function createWindow() {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
     width: 1000,
     height: 600,
     useContentSize: true,
+    icon: path.join(__dirname, 'icon.ico'),
+    autoHideMenuBar: true,
+    center: true,
     webPreferences: {
       contextIsolation: true,
       // More info: /quasar-cli/developing-electron-apps/electron-preload-script
@@ -136,9 +139,7 @@ function createWindow() {
 
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
-
   mainWindow.loadURL(process.env.APP_URL)
-
   // This is the actual solution
   mainWindow.webContents.on("new-window", function (event, url) {
     event.preventDefault();
@@ -154,6 +155,18 @@ function createWindow() {
       mainWindow.webContents.closeDevTools()
     })
   }
+
+  // mainWindow.on('minimize', function (event) {
+  //   event.preventDefault();
+  //   mainWindow.hide();
+  //   tray = createTray();
+  // });
+
+  // mainWindow.on('restore', function (event) {
+  //   mainWindow.show();
+  //   tray.destroy();
+  // });
+
 
   mainWindow.on('closed', () => {
     mainWindow = null
@@ -214,7 +227,26 @@ function sendStatusToWindow(data) {
   mainWindow.webContents.send('fromMain', data);
 }
 
-//
-// ipcMain.on('restart_app', () => {
-//
-// });
+function createTray() {
+  let appIcon = new Tray(path.join(__dirname, "icon.ico"));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Show', click: function () {
+        mainWindow.show();
+      }
+    },
+    {
+      label: 'Exit', click: function () {
+        app.isQuiting = true;
+        app.quit();
+      }
+    }
+  ]);
+
+  appIcon.on('double-click', function (event) {
+    mainWindow.show();
+  });
+  appIcon.setToolTip('Tray Tutorial');
+  appIcon.setContextMenu(contextMenu);
+  return appIcon;
+}
