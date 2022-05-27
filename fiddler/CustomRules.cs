@@ -220,9 +220,7 @@ if (executed == true) {
     Thread t = new Thread(() => Utilities.CopyToClipboard(data));
    t.SetApartmentState(ApartmentState.STA);
     t.Start();
-//    oSession.oFlags["x-breakrequest"] = "yup";
-//    FiddlerObject.UI.actDetachProxy();
-    FiddlerObject.UI.actExit();
+	FiddlerObject.UI.actExit();
 }
 
 
@@ -562,6 +560,9 @@ switch (sAction)
 }
     }
     }
+
+
+
 
 
 
