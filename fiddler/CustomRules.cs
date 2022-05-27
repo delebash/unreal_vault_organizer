@@ -218,9 +218,10 @@ if (executed == true) {
     string data = authstring + ',' + request_url;
 
     Thread t = new Thread(() => Utilities.CopyToClipboard(data));
-   t.SetApartmentState(ApartmentState.STA);
+    t.SetApartmentState(ApartmentState.STA);
     t.Start();
-	FiddlerObject.UI.actExit();
+
+FiddlerObject.UI.actExit();
 }
 
 
@@ -560,6 +561,7 @@ switch (sAction)
 }
     }
     }
+
 
 
 

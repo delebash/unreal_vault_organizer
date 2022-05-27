@@ -47,6 +47,7 @@ contextBridge.exposeInMainWorld('myNodeApi', {
       sniffer.on('close', (code) => {
         results = clipboard.readText()
         // launcher.kill('SIGTERM');
+        console.log(results)
         resolve(results)
       });
     });
