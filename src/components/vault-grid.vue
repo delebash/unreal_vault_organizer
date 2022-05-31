@@ -137,6 +137,14 @@ export default {
         }
       },
       {
+        headerName: "Description",
+        field: "description",
+        editable: false,
+        autoHeight: true,
+        wrapText: true,
+        width: 300
+      },
+      {
         headerName: 'Tags',
         field: 'tags',
         autoHeight: true,
@@ -192,20 +200,16 @@ export default {
       this.gridApi.setRowData(args.rows);
     },
     async getVaultRows() {
+      this.qt.loading.show()
+
       let user_settings = await db.user_settings.where("id").equals(1).first();
       if (user_settings !== null && user_settings !== undefined) {
-        this.qt.loading.show()
         this.unreal_token = user_settings.unreal_token
         this.account_number = user_settings.account_number
         this.vault_cache_path = user_settings.vault_cache_path
 
         let catalog_url = 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/ue/bulk/items?includeDLCDetails=false&includeMainGameDetails=false&country=US&locale=en'
         let entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/' + this.account_number + '/entitlements'
-        let count_params1 = '?start=0&count=5000'
-        // let count_params2 = '?start=1000&count=1000'
-        //Get list of entitlements for catalog query
-        entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/27966d5331e047a0a4e4b8ed06f3d0ef/entitlements'
-        let url = entitlement_url + count_params1
 
         fetch_options.method = 'GET'
         fetch_options.headers = {
@@ -213,16 +217,32 @@ export default {
           'Content-Type': 'application/json'
         }
 
-        let entitlements = await window.myNodeApi.api_fetch(url, fetch_options)
-        if (Array.isArray(entitlements) === true) {
-          let assets = await window.myNodeApi.api_fetch('https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/public/assets/Windows?label=Live', fetch_options)
-          await this.getCatalogItems(catalog_url, entitlements, assets)
-        } else {
-          this.qt.loading.hide()
-          this.showNotify('Please request a new token', 'negative', 'top', 'report_problem')
+        let assets = await window.myNodeApi.api_fetch('https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/public/assets/Windows?label=Live', fetch_options)
+        let count_params, start = 0, count = 1000
+
+        for (let i = 0; i <= 10; i++) {
+          fetch_options.method = 'GET'
+          fetch_options.headers = {
+            'Authorization': this.unreal_token,
+            'Content-Type': 'application/json'
+          }
+          count_params = '?start=' + start + '&count=' + count
+          let entitlements = await window.myNodeApi.api_fetch(entitlement_url + count_params, fetch_options)
+          if (Array.isArray(entitlements) === true && entitlements.length > 0) {
+            await this.getCatalogItems(catalog_url, entitlements, assets)
+            start = start + count
+          } else if (i === 0 && entitlements.length === 0) {
+            this.showNotify('Please request a new token', 'negative', 'top', 'report_problem')
+            break;
+          } else {
+            break
+          }
         }
+
+        this.qt.loading.hide()
       } else {
         this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
+        this.qt.loading.hide()
       }
     },
     async getCatalogItems(catalog_url, entitlements, assets) {
@@ -234,7 +254,6 @@ export default {
         'Authorization': this.unreal_token,
         'Content-Type': 'application/x-www-form-urlencoded'
       }
-
       while (start <= entitlements_length - 1) {
         let catalog_Itemid = entitlements[start].catalogItemId
         form_body = form_body + 'id=' + catalog_Itemid + '&'
@@ -279,7 +298,6 @@ export default {
           })
         }
       }
-      this.qt.loading.hide()
       await this.loadGrid();
       if (this.updates === true) {
         this.showNotify('Updates available', 'secondary', 'top')
@@ -340,7 +358,6 @@ export default {
         })
       }
       // if (event.column.colId === 'updates_available') {
-      //   console.log('test')
       //   await db.vault_library.update(event.data.catalogItemId, {
       //     updates_available: event.data.updates_available
       //   })
