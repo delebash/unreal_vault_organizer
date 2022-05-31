@@ -233,8 +233,13 @@ export default {
             start = start + count
           } else if (i === 0 && entitlements.length === 0) {
             this.showNotify('Please request a new token', 'negative', 'top', 'report_problem')
+            this.qt.loading.hide()
             break;
           } else {
+            if (entitlements.errorCode) {
+              this.showNotify('Please request a new token', 'negative', 'top', 'report_problem')
+              this.qt.loading.hide()
+            }
             break
           }
         }
