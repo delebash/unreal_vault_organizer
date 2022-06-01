@@ -84,7 +84,7 @@ export default {
     },
     async loadData() {
       this.tag_info_options = await db.tags.toArray()
-      this.tag_info_options = this.tag_info_options.slice().reverse()
+      this.tag_info_options = this.tag_info_options.sort((a, b) => (a.label > b.label) ? 1 : -1)
       if (this.params.data.tagIds !== undefined) {
         this.tags = await db.tags.where('id').anyOf(this.params.data.tagIds).toArray() || []
       }

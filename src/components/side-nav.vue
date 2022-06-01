@@ -30,7 +30,7 @@
         </template>
       </q-select>
 
-      <span v-for="tag in tag_info_options.slice().reverse()">
+      <span v-for="tag in tag_info_options.sort((a, b) => (a.label > b.label) ? 1 : -1)">
           <q-chip
             removable
             clickable
@@ -265,6 +265,8 @@ export default {
     },
     async loadData() {
       this.tag_info_options = await db.tags.toArray()
+      console.log(this.tag_info_options)
+      this.tag_info_options = this.tag_info_options.sort((a, b) => (a.label > b.label) ? 1 : -1)
     }
   }
 }
