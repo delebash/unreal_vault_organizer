@@ -30,7 +30,7 @@
         </template>
       </q-select>
 
-      <span v-for="tag in tag_info_options">
+      <span v-for="tag in tag_info_options.slice().reverse()">
           <q-chip
             removable
             clickable
