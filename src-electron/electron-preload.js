@@ -40,9 +40,12 @@ contextBridge.exposeInMainWorld('myNodeApi', {
     }
   },
 
-  launchSniffer: (snifferPath, launcherPath) => {
+  launchSniffer: (snifferPath, launcherPath,auto_launch) => {
     const sniffer = child.spawn(snifferPath);
-    const launcher = child.spawn(launcherPath);
+    console.log(auto_launch)
+    if(auto_launch === true) {
+      const launcher = child.spawn(launcherPath);
+    }
     return new Promise(resolve => {
       sniffer.on('close', (code) => {
         results = clipboard.readText()
