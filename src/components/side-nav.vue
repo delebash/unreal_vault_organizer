@@ -177,7 +177,6 @@ export default {
             if (row.tagIds) {
               if (row.tagIds.length > 0) {
                 if (this.equalsIgnoreOrder(row.tagIds, tagIds) === true) {
-                  console.log(row.tagIds)
                   filteredRows.push(row)
                 }
               }
