@@ -176,7 +176,10 @@ export default {
           for (let row of rows) {
             if (row.tagIds) {
               if (row.tagIds.length > 0) {
-                if (this.equalsIgnoreOrder(row.tagIds, tagIds) === true) {
+                const containsAll = tagIds.every(element => {
+                  return row.tagIds.includes(element);
+                });
+                if(containsAll === true){
                   filteredRows.push(row)
                 }
               }
