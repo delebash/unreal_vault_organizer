@@ -63,7 +63,7 @@ contextBridge.exposeInMainWorld('myNodeApi', {
         let item_data = {}
 
         let file = path.join(vault_cache_path, element.name, 'manifest');
-        if (fs.existsSync(path)) {
+        if (fs.existsSync(file)) {
 
           let data = fs.readFileSync(file);
           let jsonData = JSON.parse(data.toString());
