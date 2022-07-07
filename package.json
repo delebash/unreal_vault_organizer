@@ -35,7 +35,7 @@
   "devDependencies": {
     "@quasar/app-vite": "^1.0.5",
     "autoprefixer": "^10.4.7",
-    "electron": "^6.1.12",
+    "electron": "^18.2.4",
     "electron-builder": "^23.1.0"
   },
   "engines": {
