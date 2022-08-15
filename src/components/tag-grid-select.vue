@@ -80,7 +80,6 @@ export default {
       })
     },
     selectedTag(e) {
-      // console.log(this.params)
     },
     async loadData() {
       this.tag_info_options = await db.tags.toArray()

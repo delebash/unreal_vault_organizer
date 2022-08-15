@@ -21,7 +21,8 @@ import fs from "fs";
 const fetch = require('node-fetch');
 const child = require('child_process')
 import {contextBridge, clipboard, ipcRenderer} from 'electron'
-import path from "path";
+const process = require('process');
+import {execSync} from "child_process";
 
 let results
 
@@ -40,20 +41,12 @@ contextBridge.exposeInMainWorld('myNodeApi', {
     }
   },
 
-  launchSniffer: (snifferPath, launcherPath,auto_launch) => {
-    const sniffer = child.spawn(snifferPath);
-    console.log(auto_launch)
-    if(auto_launch === true) {
-      const launcher = child.spawn(launcherPath);
-    }
-    return new Promise(resolve => {
-      sniffer.on('close', (code) => {
-        results = clipboard.readText()
-        // launcher.kill('SIGTERM');
-        console.log(results)
-        resolve(results)
-      });
-    });
+  launchSniffer: () => {
+    let cmd_str
+    cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList "--mode transparent", "--scripts py_scripts/main.py"'
+    execSync(cmd_str, {'shell': 'powershell.exe'});
+    results = clipboard.readText()
+    return results
   },
   get_build_versions: (vault_cache_path) => {
     let arrItems = []

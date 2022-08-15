@@ -190,6 +190,10 @@ module.exports = configure(function (/* ctx */) {
         // https://www.electron.build/configuration/configuration
 
         appId: 'unreal_vault_organizer',
+        "extraFiles": [
+          "py_scripts",
+          "mitmproxy"
+        ],
         publish: {
           'provider': 'github'
         },

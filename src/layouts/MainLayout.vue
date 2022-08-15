@@ -49,16 +49,7 @@
                     />
                   </template>
                 </q-input>
-                <q-input dense v-model="launcher_path" label="Uneral Launcher Path*" stack-label
-                         lazy-rules
-                         :rules="[ val => val && val.length > 0 || 'Please type something']"
-                > <q-checkbox v-model="launch_unreal"  label="auto launch"/>
-                </q-input>
-                <q-input dense v-model="sniffer_path" label="Sniffer Path*" stack-label
-                         lazy-rules
-                         :rules="[ val => val && val.length > 0 || 'Please type something']"
-                >
-                </q-input>
+
                 <q-input dense v-model="vault_cache_path" label="Vault Cache Path*" stack-label
                          lazy-rules
                          :rules="[ val => val && val.length > 0 || 'Please type something']"
@@ -96,10 +87,7 @@ export default {
     const $q = useQuasar()
     return {
       qt: $q,
-      launch_unreal: ref(false),
-      launcher_path: ref(''),
       vault_cache_path: ref(''),
-      sniffer_path: ref(''),
       isPwd: ref(true),
       selectedTab: ref('vault'),
       unreal_token: ref(''),
@@ -110,7 +98,6 @@ export default {
   mounted: async function () {
 
     window.myNodeApi.receive("fromMain", (data) => {
-      console.log(data.msg)
       if (data.event === 'update-downloaded') {
         let actions = [
           {
@@ -135,9 +122,7 @@ export default {
       }
     },
     async getToken() {
-      // let snifferPath = 'Fiddler.exe'
-      // let launcherPath = 'F:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win64\EpicGamesLauncher.exe'
-      let data = await window.myNodeApi.launchSniffer(this.sniffer_path, this.launcher_path, this.launch_unreal)
+           let data = await window.myNodeApi.launchSniffer()
 
       const dataArray = data.split(",");
       this.unreal_token = dataArray[0].toString()
@@ -158,10 +143,7 @@ export default {
         id: 1,
         account_number: this.account_number,
         unreal_token: this.unreal_token,
-        sniffer_path: this.sniffer_path,
-        launcher_path: this.launcher_path,
-        vault_cache_path: this.vault_cache_path,
-        launch_unreal: this.launch_unreal
+        vault_cache_path: this.vault_cache_path
       })
     },
     showNotify(msg, color, position, icon, actions) {
@@ -178,10 +160,7 @@ export default {
       if (user_settings !== null && user_settings !== undefined) {
         this.unreal_token = user_settings.unreal_token
         this.account_number = user_settings.account_number
-        this.launcher_path = user_settings.launcher_path
-        this.sniffer_path = user_settings.sniffer_path
         this.vault_cache_path = user_settings.vault_cache_path
-        this.launch_unreal = user_settings.launch_unreal
 
       } else {
        // this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
