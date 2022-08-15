@@ -21,6 +21,7 @@ import fs from "fs";
 const fetch = require('node-fetch');
 const child = require('child_process')
 import {contextBridge, clipboard, ipcRenderer} from 'electron'
+
 const process = require('process');
 import {execSync} from "child_process";
 
@@ -40,7 +41,12 @@ contextBridge.exposeInMainWorld('myNodeApi', {
       ipcRenderer.on(channel, (event, ...args) => func(...args));
     }
   },
-
+  installMitmSSL: () => {
+    const { execSync } = require('child_process');
+    let cmd_str
+    cmd_str = 'Start-Process -FilePath "py_scripts/mitmproxy-ca-cert.p12"'
+    execSync(cmd_str, {'shell': 'powershell.exe'});
+  },
   launchSniffer: () => {
     let cmd_str
     cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList "--mode transparent", "--scripts py_scripts/main.py"'

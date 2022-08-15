@@ -55,9 +55,12 @@
                          :rules="[ val => val && val.length > 0 || 'Please type something']"
                 >
                 </q-input>
+                <q-btn class="q-pt-none" dense @click="installMtimSSL()" color="primary"
+                       label="Install Sniffer SSL Certificates"></q-btn>
+                <br>
                 <q-btn class="q-pt-none" dense @click="getToken()" color="primary"
                        label="GetToken"></q-btn>
-
+                <br>
                 <q-btn class="q-pt-none" dense @click="saveUserSettings()" color="positive"
                        label="Save settings"></q-btn>
               </div>
@@ -121,8 +124,12 @@ export default {
         })
       }
     },
+
+    async installMtimSSL() {
+      await window.myNodeApi.installMitmSSL()
+    },
     async getToken() {
-           let data = await window.myNodeApi.launchSniffer()
+      let data = await window.myNodeApi.launchSniffer()
 
       const dataArray = data.split(",");
       this.unreal_token = dataArray[0].toString()
@@ -163,7 +170,7 @@ export default {
         this.vault_cache_path = user_settings.vault_cache_path
 
       } else {
-       // this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
+        // this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
       }
     }
   }
