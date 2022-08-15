@@ -55,14 +55,14 @@
                          :rules="[ val => val && val.length > 0 || 'Please type something']"
                 >
                 </q-input>
-                <q-btn class="q-pt-none" dense @click="installMtimSSL()" color="primary"
-                       label="Install Sniffer SSL Certificates"></q-btn>
-                <br>
                 <q-btn class="q-pt-none" dense @click="getToken()" color="primary"
                        label="GetToken"></q-btn>
                 <br>
                 <q-btn class="q-pt-none" dense @click="saveUserSettings()" color="positive"
                        label="Save settings"></q-btn>
+                <br>
+                <q-btn class="q-pt-none" dense @click="installMtimSSL()" color="primary"
+                       label="Install Sniffer SSL Certificates"></q-btn>
               </div>
             </q-tab-panel>
           </q-tab-panels>
