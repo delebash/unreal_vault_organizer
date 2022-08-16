@@ -20,7 +20,7 @@ import fs from "fs";
 
 const fetch = require('node-fetch');
 import {contextBridge, clipboard, ipcRenderer} from 'electron';
-import {execSync, exec} from "child_process";
+import {execSync} from "child_process";
 
 
 let results
