@@ -20,7 +20,7 @@ import fs from "fs";
 
 const fetch = require('node-fetch');
 import {contextBridge, clipboard, ipcRenderer} from 'electron';
-import {execSync} from "child_process";
+import {execSync, exec, execFile} from "child_process";
 
 
 let results
@@ -51,10 +51,17 @@ contextBridge.exposeInMainWorld('myNodeApi', {
     execSync(cmd_str, {'shell': 'powershell.exe'});
 
   },
-  launchSniffer: () => {
+
+  launchSniffer: (launch_unreal, launcher_path) => {
     let cmd_str
     cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList "--mode transparent", "--scripts py_scripts/get_auth.py"'
     execSync(cmd_str, {'shell': 'powershell.exe'});
+    if (launch_unreal === true) {
+      setTimeout(function() {
+        execFile(launcher_path)
+      }, 12000);
+
+    }
     results = clipboard.readText()
     return results
   },
