@@ -1,6 +1,6 @@
 # Unreal Vault Organizer using Electron 
 
-Organize your unreal vault plugins
+Organize your unreal vault assets
 
 A simple application that downloads your unreal vault inventory and allows you to organize it by tags.  In addition it will notify you when you have updates for a plugin.  You can then sort by updates to determine which plugins have updates available(still testing this).
 
