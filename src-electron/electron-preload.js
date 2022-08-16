@@ -19,11 +19,9 @@
 import fs from "fs";
 
 const fetch = require('node-fetch');
-const child = require('child_process')
-import {contextBridge, clipboard, ipcRenderer} from 'electron'
+import {contextBridge, clipboard, ipcRenderer} from 'electron';
+import {execSync, exec} from "child_process";
 
-const process = require('process');
-import {execSync} from "child_process";
 
 let results
 
@@ -42,14 +40,20 @@ contextBridge.exposeInMainWorld('myNodeApi', {
     }
   },
   installMitmSSL: () => {
-    const { execSync } = require('child_process');
+    const {execSync} = require("child_process");
     let cmd_str
-    cmd_str = 'Start-Process -FilePath "py_scripts/mitmproxy-ca-cert.p12"'
+//Launch mitmproxy to create initial certs and close
+    cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList  "--scripts py_scripts/close_app.py"'
     execSync(cmd_str, {'shell': 'powershell.exe'});
+
+// // Install Certs
+    cmd_str = 'Start-Process -Verb RunAs -FilePath "certutil.exe" -ArgumentList "-addstore root $home/.mitmproxy/mitmproxy-ca-cert.cer"'
+    execSync(cmd_str, {'shell': 'powershell.exe'});
+
   },
   launchSniffer: () => {
     let cmd_str
-    cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList "--mode transparent", "--scripts py_scripts/main.py"'
+    cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList "--mode transparent", "--scripts py_scripts/get_auth.py"'
     execSync(cmd_str, {'shell': 'powershell.exe'});
     results = clipboard.readText()
     return results
@@ -100,3 +104,30 @@ contextBridge.exposeInMainWorld('myNodeApi', {
     return json
   }
 })
+
+
+/**
+ * @param {string} executable
+ * @param {string[]} args
+ * @param {import('child_process').SpawnOptions} opts
+ * @return {Promise<number>} return code
+ * */
+async function run(executable, args, opts = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(executable, args, {
+      shell: true,
+      stdio: ["pipe", process.stdout, process.stderr],
+      ...opts,
+    });
+    child.on("error", reject);
+    child.on("exit", (code) => {
+      if (code === 0) {
+        resolve(code);
+      } else {
+        const e = new Error('Process exited with error code ' + code);
+        e.code = code;
+        reject(e);
+      }
+    });
+  });
+}
