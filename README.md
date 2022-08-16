@@ -15,6 +15,19 @@ The win.zip file is for portable installs.  Just unzip. The exe will run the nor
 
 Click on Unreal Vault Organizer. You will be asked for admin permission as this is necessary to obtain the Unreal authorization token using the built in network sniffer.
 
+# Support:
+Add issues in github
+
+Get help at my discord channel https://discord.gg/2WkHWNDf8q
+
+Other free Unreal projects:
+
+https://github.com/delebash/UnrealMapboxBridgePlugin
+
+https://github.com/delebash/unreal_mapbox_bridge
+
+
+
 # Setup Instructions:
 
 Install SSL certificates (one time install).
