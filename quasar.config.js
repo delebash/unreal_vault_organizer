@@ -198,6 +198,7 @@ module.exports = configure(function (/* ctx */) {
           'provider': 'github'
         },
         win: {// configuration parameters of installation software under Windows
+          requestedExecutionLevel: 'requireAdministrator',
           target: [
             "NSIS", // package as NSIS installation file
             "Zip" // package as the installation file zip
