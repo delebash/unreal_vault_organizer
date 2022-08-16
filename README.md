@@ -4,6 +4,7 @@ Organize your unreal vault plugins
 
 A simple application that downloads your unreal vault inventory and allows you to organize it by tags.  In addition it will notify you when you have updates for a plugin.  You can then sort by updates to determine which plugins have updates available(still testing this).
 
+![](docs/images/Unreal_Vault_Organizer_I2PqaHAKlQ.png)
 
 Intro video: https://youtu.be/ywnvcVgiW3o
 
@@ -52,7 +53,7 @@ When you get a notification that you have Updates.  Click on the Updates Availab
 
 Click on the Image of the product you have an Update for and it will open in the Launcher so you can update it.
 
-![](docs/images/Unreal_Vault_Organizer_I2PqaHAKlQ.png)
+
 
 ![](docs/images/2022-05-16%20(5).png)
 
