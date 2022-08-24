@@ -210,14 +210,15 @@ export default {
 
         let catalog_url = 'https://catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/ue/bulk/items?includeDLCDetails=false&includeMainGameDetails=false&country=US&locale=en'
         let entitlement_url = 'https://entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/' + this.account_number + '/entitlements'
+        let assets_url = 'https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/public/assets/Windows?label=Live'
 
         fetch_options.method = 'GET'
         fetch_options.headers = {
           'Authorization': this.unreal_token,
           'Content-Type': 'application/json'
         }
-
-        let assets = await window.myNodeApi.api_fetch('https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/public/assets/Windows?label=Live', fetch_options)
+        fetch_options.url = assets_url
+        let assets = await window.myNodeApi.api_fetch(fetch_options)
         let count_params, start = 0, count = 1000
 
         for (let i = 0; i <= 10; i++) {
@@ -227,7 +228,8 @@ export default {
             'Content-Type': 'application/json'
           }
           count_params = '?start=' + start + '&count=' + count
-          let entitlements = await window.myNodeApi.api_fetch(entitlement_url + count_params, fetch_options)
+          fetch_options.url = entitlement_url + count_params
+          let entitlements = await window.myNodeApi.api_fetch(fetch_options)
           if (Array.isArray(entitlements) === true && entitlements.length > 0) {
             await this.getCatalogItems(catalog_url, entitlements, assets)
             start = start + count
@@ -266,7 +268,8 @@ export default {
       }
 
       fetch_options.body = form_body.slice(0, -1);
-      response = await window.myNodeApi.api_fetch(catalog_url, fetch_options)
+      fetch_options.url = catalog_url
+      response = await window.myNodeApi.api_fetch(fetch_options)
       for (let catalog_item of Object.values(response)) {
         buildVersion = ''
         for (let asset of assets) {

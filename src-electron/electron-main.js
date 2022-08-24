@@ -1,9 +1,13 @@
-import {app, BrowserWindow, nativeTheme, Menu, ipcMain, shell, Tray} from 'electron'
+import {app, BrowserWindow, nativeTheme, Menu, ipcMain, shell, Tray, clipboard} from 'electron'
 
 const contextMenu = require('electron-context-menu');
 import path from 'path'
 import os from 'os'
+import {execSync, exec, execFile} from "child_process";
+import * as fs from "fs";
+import fetch from 'node-fetch';
 
+// import got from 'got'
 const {autoUpdater} = require('electron-updater');
 const log = require('electron-log');
 // needed in case process is undefined under Linux
@@ -249,3 +253,79 @@ function createTray() {
   appIcon.setContextMenu(contextMenu);
   return appIcon;
 }
+
+ipcMain.handle('installMitmSSL', async (_, args) => {
+  const {execSync} = require("child_process");
+  let cmd_str
+//Launch mitmproxy to create initial certs and close
+  cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList  "--scripts py_scripts/close_app.py"'
+  execSync(cmd_str, {'shell': 'powershell.exe'});
+
+// Install Certs
+  cmd_str = 'Start-Process -Verb RunAs -FilePath "certutil.exe" -ArgumentList "-addstore root $home/.mitmproxy/mitmproxy-ca-cert.cer"'
+  execSync(cmd_str, {'shell': 'powershell.exe'});
+})
+
+ipcMain.handle('launchSniffer', async (_, args) => {
+  let cmd_str
+  cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList "--mode transparent", "--scripts py_scripts/get_auth.py"'
+  execSync(cmd_str, {'shell': 'powershell.exe'});
+  // if (args[0] === true) {
+  //   setTimeout(function() {
+  //     execFile(args[1])
+  //   }, 12000);
+  //
+  // }
+  let results = clipboard.readText()
+  return results
+})
+
+ipcMain.handle('get_build_versions', async (_, args) => {
+  let arrItems = []
+  let vault_cache_path = args
+  console.log(vault_cache_path)
+  fs.readdirSync(vault_cache_path, {withFileTypes: true})
+    .filter(dirent => dirent.isDirectory())
+    .forEach((element, index) => {
+      let item_data = {}
+
+      let file = path.join(vault_cache_path, element.name, 'manifest');
+      if (fs.existsSync(file)) {
+
+        let data = fs.readFileSync(file);
+        let jsonData = JSON.parse(data.toString());
+        item_data.installed = false;
+        if (jsonData.CustomFields.InstallLocation) {
+          item_data.installed = true;
+          item_data.installed_location = jsonData.CustomFields.InstallLocation;
+        }
+        item_data.BuildVersionString = jsonData.BuildVersionString
+        item_data.AppNameString = jsonData.AppNameString
+        item_data.CatalogItemId = jsonData.CustomFields.CatalogItemId
+        item_data.CatalogAssetName = jsonData.CustomFields.CatalogAssetName
+
+        arrItems.push(item_data)
+      }
+    });
+
+  return arrItems
+})
+
+ipcMain.handle('api_fetch', async (_, args) => {
+  let fetch_options = args
+let response
+    if (fetch_options.method === 'POST') {
+      response = await fetch(fetch_options.url, {
+        method: fetch_options.method,
+        headers: fetch_options.headers,
+        body: fetch_options.body
+      });
+    } else {
+      response = await fetch(fetch_options.url, {
+        method: fetch_options.method,
+        headers: fetch_options.headers
+      });
+    }
+  let json = await response.json();
+  return json
+})
