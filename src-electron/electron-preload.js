@@ -17,7 +17,7 @@
  */
 
 import fs from "fs";
-
+import path from "path";
 const fetch = require('node-fetch');
 import {contextBridge, clipboard, ipcRenderer} from 'electron';
 import {execSync, exec, execFile} from "child_process";
