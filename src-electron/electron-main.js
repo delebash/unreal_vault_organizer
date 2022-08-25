@@ -194,12 +194,12 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on("toMain", (event, data) => {
+ipcMain.on("restart", (event, data) => {
   // Send result back to renderer process
   // mainWindow.webContents.send("fromMain", 'jjjj');
-  if (data.event === 'restart') {
+  // if (data.event === 'restart') {
     autoUpdater.quitAndInstall();
-  }
+  // }
 })
 
 //Auto Updater

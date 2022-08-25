@@ -120,18 +120,18 @@ export default {
 
   mounted: async function () {
 
-    // window.myNodeApi.receive("fromMain", (data) => {
-    //   if (data.event === 'update-downloaded') {
-    //     let actions = [
-    //       {
-    //         label: 'Restart Now?', color: 'white', handler: () => {
-    //           window.myNodeApi.send("toMain", {event: 'restart', msg: ''});
-    //         }
-    //       }
-    //     ]
-    //     this.showNotify('Update downloaded, ready to restart and install.', 'info', 'top', 'announcement', actions)
-    //   }
-    // });
+    window.myNodeApi.receive("fromMain", (data) => {
+      if (data.event === 'update-downloaded') {
+        let actions = [
+          {
+            label: 'Restart Now?', color: 'white', handler: () => {
+              window.myNodeApi.restart();
+            }
+          }
+        ]
+        this.showNotify('Update downloaded, ready to restart and install.', 'info', 'top', 'announcement', actions)
+      }
+    });
     await this.loadColorPalette()
     await this.loadData()
   },
@@ -191,8 +191,7 @@ export default {
         this.account_number = user_settings.account_number
      //   this.launcher_path = user_settings.launcher_path
         this.vault_cache_path = user_settings.vault_cache_path
-        this.launch_unreal = user_settings.launch_unreal
-console.log(user_settings.launcher_path)
+        // this.launch_unreal = user_settings.launch_unreal
       } else {
         // this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
       }
