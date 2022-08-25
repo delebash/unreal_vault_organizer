@@ -40,5 +40,5 @@ contextBridge.exposeInMainWorld('myNodeApi', {
   get_build_versions: async (vault_cache_path) =>
     ipcRenderer.invoke('get_build_versions', vault_cache_path),
   api_fetch: async (fetch_options) =>
-    ipcRenderer.invoke(fetch_options)
+    ipcRenderer.invoke('api_fetch', fetch_options)
 })
