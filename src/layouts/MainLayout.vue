@@ -125,7 +125,7 @@ export default {
         let actions = [
           {
             label: 'Restart Now?', color: 'white', handler: () => {
-              window.myNodeApi.restart();
+              window.myNodeApi.send("toMain", {event: 'restart', msg: ''});
             }
           }
         ]
