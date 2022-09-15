@@ -157,8 +157,8 @@ export default {
 
       if (url !== 'none') {
         this.account_number = url.substring(
-          url.lastIndexOf("v1/") + 3,
-          url.lastIndexOf("/settings")
+          url.lastIndexOf("friends/") + 8,
+          url.lastIndexOf("?")
         );
       }
       await this.saveUserSettings()
