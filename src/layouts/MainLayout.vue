@@ -129,7 +129,7 @@ export default {
             }
           }
         ]
-        this.showNotify('Update downloaded, ready to restart and install.', 'info', 'top', 'announcement', actions)
+        this.showNotify('Update downloaded, ready to restart and install.', 'info', 'top', 'announcement', actions, 'white')
       }
     });
     await this.loadColorPalette()
@@ -175,12 +175,13 @@ export default {
         launch_unreal: this.launch_unreal
       })
     },
-    showNotify(msg, color, position, icon, actions) {
+    showNotify(msg, color, position, icon, actions, textColor) {
       this.qt.notify({
         message: msg,
         color: color,
         position: position,
         icon: icon,
+        textColor: textColor,
         actions: actions
       })
     },

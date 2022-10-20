@@ -1,6 +1,6 @@
 {
   "name": "unreal_vault_organizer",
-  "version": "1.4.14",
+  "version": "1.4.16",
   "description": "Organize your unreal vault plugins",
   "productName": "Unreal Vault Organizer",
   "author": "daniel <danelebash@hotmail.com>",
@@ -26,8 +26,8 @@
     "electron-context-menu": "^3.5.0",
     "electron-log": "^4.4.8",
     "electron-updater": "^5.2.1",
-    "node-fetch": "^2.6.7",
     "mitt": "^3.0.0",
+    "node-fetch": "^2.6.7",
     "quasar": "^2.8.2",
     "rxjs": "^7.5.6",
     "vue": "^3.2.39",
@@ -36,7 +36,8 @@
   "devDependencies": {
     "@quasar/app-vite": "^1.1.0",
     "autoprefixer": "^10.4.11",
-    "electron": "^20.1.4"
+    "electron": "^20.1.4",
+    "electron-builder": "^22.14.13"
   },
   "engines": {
     "node": "^18 || ^16 || ^14.19",
