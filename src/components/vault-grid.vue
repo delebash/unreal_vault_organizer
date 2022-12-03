@@ -1,5 +1,7 @@
 <template>
-  <div id="app">
+  <div class="row">
+    <div class="col">
+
     <q-btn class="q-pt-none" dense @click="loadGrid" color="deep-orange-12"
            label="Refresh Grid"></q-btn>
     ---
@@ -10,9 +12,8 @@
       Updates Available
     </q-chip>
 
-
     <ag-grid-vue
-      style="width: 100%; height: 94%;"
+      style="width: 100%; height: 91%;"
       class="ag-theme-alpine"
       id="myGrid"
       :refreshCells="true"
@@ -28,10 +29,12 @@
       @selection-changed="onSelectionChanged"
       @first-data-rendered="onFirstDataRendered">
     </ag-grid-vue>
+      <b>Row count:</b> {{rowCount}}
+  </div>
   </div>
 </template>
 <style lang="css">
-/*@import "../styles.css";*/
+
 </style>
 <script>
 
@@ -42,6 +45,7 @@ import {db} from '../db';
 import {useQuasar, Notify} from 'quasar'
 
 
+
 let fetch_options = {
   method: '',
   headers: {},
@@ -49,6 +53,7 @@ let fetch_options = {
 }
 
 export default {
+
   setup() {
     const $q = useQuasar()
     // Gets called once before editing starts, to give editor a chance to
@@ -74,6 +79,7 @@ export default {
       vault_cache_path: '',
       columnDefs: ref([]),
       tag_info_options: ref([]),
+      rowCount: 0,
       gridApi: null,
       gridColumnApi: null,
       rowData: ref([]),
@@ -186,6 +192,8 @@ export default {
     this.rowSelection = 'multiple';
     this.overlayLoadingTemplate =
       '<span class="ag-overlay-loading-center">Please wait while your rows are loading. This could take a minute to refresh your data.</span>';
+
+
   },
   methods: {
     showNotify(msg, color, position, icon) {
@@ -328,6 +336,7 @@ export default {
           catalogItem.updates_available = await this.getVaultUpdates(catalogItem)
           return catalogItem
         }));
+       this.rowCount = this.rowData.length
         //   this.qt.loading.hide()
       } else {
         this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
