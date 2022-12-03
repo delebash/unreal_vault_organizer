@@ -144,9 +144,14 @@ function createWindow() {
   Menu.setApplicationMenu(menu)
   mainWindow.loadURL(process.env.APP_URL)
   // This is the actual solution
-  mainWindow.webContents.on("new-window", function (event, url) {
-    event.preventDefault();
-    shell.openExternal(url);
+  // mainWindow.webContents.on("new-window", function (event, url) {
+  //   event.preventDefault();
+  //   shell.openExternal(url);
+  // });
+
+  mainWindow.webContents.setWindowOpenHandler((data) => {
+    shell.openExternal(data.url);
+    return { action: "deny" };
   });
 
   if (process.env.DEBUGGING) {
