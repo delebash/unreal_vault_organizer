@@ -2,35 +2,35 @@
   <div class="row">
     <div class="col">
 
-    <q-btn class="q-pt-none" dense @click="loadGrid" color="deep-orange-12"
-           label="Refresh Grid"></q-btn>
-    ---
-    <q-btn class="q-pt-none" dense @click="getVaultRows" color="primary"
-           label="Download Vault"></q-btn>
-    &nbsp;&nbsp;&nbsp;&nbsp;
-    <q-chip v-show="updates" color="yellow-9" text-color="white">
-      Updates Available
-    </q-chip>
+      <q-btn class="q-pt-none" dense @click="loadGrid" color="deep-orange-12"
+             label="Refresh Grid"></q-btn>
+      ---
+      <q-btn class="q-pt-none" dense @click="downloadVault" color="primary"
+             label="Download Vault"></q-btn>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <q-chip v-show="updates" color="yellow-9" text-color="white">
+        Updates Available
+      </q-chip>
 
-    <ag-grid-vue
-      style="width: 100%; height: 91%;"
-      class="ag-theme-alpine"
-      id="myGrid"
-      :refreshCells="true"
-      :columnDefs="columnDefs"
-      @grid-ready="onGridReady"
-      :defaultColDef="defaultColDef"
-      :rowData="rowData"
-      :getRowNodeId="getRowNodeId"
-      :valueCache="true"
-      :rowSelection="rowSelection"
-      :overlayLoadingTemplate="overlayLoadingTemplate"
-      @cell-value-changed="onCellValueChanged"
-      @selection-changed="onSelectionChanged"
-      @first-data-rendered="onFirstDataRendered">
-    </ag-grid-vue>
-      <b>Row count:</b> {{rowCount}}
-  </div>
+      <ag-grid-vue
+        style="width: 100%; height: 91%;"
+        class="ag-theme-alpine"
+        id="myGrid"
+        :refreshCells="true"
+        :columnDefs="columnDefs"
+        @grid-ready="onGridReady"
+        :defaultColDef="defaultColDef"
+        :rowData="rowData"
+        :getRowNodeId="getRowNodeId"
+        :valueCache="true"
+        :rowSelection="rowSelection"
+        :overlayLoadingTemplate="overlayLoadingTemplate"
+        @cell-value-changed="onCellValueChanged"
+        @selection-changed="onSelectionChanged"
+        @first-data-rendered="onFirstDataRendered">
+      </ag-grid-vue>
+      <b>Row count:</b> {{ rowCount }}
+    </div>
   </div>
 </template>
 <style lang="css">
@@ -43,7 +43,6 @@ import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import {db} from '../db';
 import {useQuasar, Notify} from 'quasar'
-
 
 
 let fetch_options = {
@@ -207,7 +206,7 @@ export default {
     filterRows(args) {
       this.gridApi.setRowData(args.rows);
     },
-    async getVaultRows() {
+    async downloadVault() {
       this.qt.loading.show()
 
       let user_settings = await db.user_settings.where("id").equals(1).first();
@@ -229,7 +228,8 @@ export default {
         let assets = await window.myNodeApi.api_fetch(fetch_options)
         let count_params, start = 0, count = 1000
 
-        for (let i = 0; i <= 10; i++) {
+        //loop 20 times or until entitlements count = 0 this should load 20,000 assets if someone has that many
+        for (let i = 0; i <= 20; i++) {
           fetch_options.method = 'GET'
           fetch_options.headers = {
             'Authorization': this.unreal_token,
@@ -253,7 +253,7 @@ export default {
             break
           }
         }
-
+        await this.loadGrid()
         this.qt.loading.hide()
       } else {
         this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
@@ -277,8 +277,8 @@ export default {
 
       fetch_options.body = form_body.slice(0, -1);
       fetch_options.url = catalog_url
-      response = await window.myNodeApi.api_fetch(fetch_options)
-      for (let catalog_item of Object.values(response)) {
+      let items = await window.myNodeApi.api_fetch(fetch_options)
+      for (let catalog_item of Object.values(items)) {
         buildVersion = ''
         for (let asset of assets) {
           if (asset.catalogItemId === catalog_item.id) {
@@ -314,10 +314,6 @@ export default {
           })
         }
       }
-      await this.loadGrid();
-      if (this.updates === true) {
-        this.showNotify('Updates available', 'secondary', 'top')
-      }
     },
     async loadGrid() {
       let user_settings = await db.user_settings.where("id").equals(1).first();
@@ -333,11 +329,19 @@ export default {
         let catalogItems = await db.vault_library.toArray()
         this.rowData = await Promise.all(catalogItems.map(async catalogItem => {
           catalogItem.tags = await db.tags.where('id').anyOf([1]).toArray()
-          catalogItem.updates_available = await this.getVaultUpdates(catalogItem)
+          if (Array.isArray(this.build_versions) === true && this.build_versions.length > 0) {
+            catalogItem.updates_available = await this.getVaultUpdates(catalogItem)
+          }
           return catalogItem
         }));
-       this.rowCount = this.rowData.length
-        //   this.qt.loading.hide()
+
+        this.rowCount = this.rowData.length
+
+        if (this.updates === true) {
+          this.showNotify('Updates available', 'secondary', 'top')
+        }
+       // console.log("row count" + this.rowCount)
+        // this.qt.loading.hide()
       } else {
         this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
       }

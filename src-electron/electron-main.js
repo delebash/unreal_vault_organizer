@@ -1,15 +1,14 @@
 import {app, BrowserWindow, nativeTheme, Menu, ipcMain, shell, Tray, clipboard} from 'electron'
 
-const contextMenu = require('electron-context-menu');
+import contextMenu from 'electron-context-menu';
 import path from 'path'
 import os from 'os'
-import {execSync, exec, execFile} from "child_process";
+import {execSync} from "child_process";
 import * as fs from "fs";
 import fetch from 'node-fetch';
 
-// import got from 'got'
-const {autoUpdater} = require('electron-updater');
-const log = require('electron-log');
+import {autoUpdater} from 'electron-updater';
+import log from 'electron-log';
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform()
 
@@ -19,12 +18,7 @@ log.info('App starting...');
 
 let tray = null;
 
-try {
-  if (platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
-    require('fs').unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'))
-  }
-} catch (_) {
-}
+
 
 contextMenu({
   showSaveImageAs: true,
@@ -260,7 +254,7 @@ function createTray() {
 }
 
 ipcMain.handle('installMitmSSL', async (_, args) => {
-  const {execSync} = require("child_process");
+
   let cmd_str
 //Launch mitmproxy to create initial certs and close
   cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList  "--scripts py_scripts/close_app.py"'
@@ -303,16 +297,17 @@ ipcMain.handle('get_build_versions', async (_, args) => {
         if (jsonData.CustomFields.InstallLocation) {
           item_data.installed = true;
           item_data.installed_location = jsonData.CustomFields.InstallLocation;
-        }
-        item_data.BuildVersionString = jsonData.BuildVersionString
-        item_data.AppNameString = jsonData.AppNameString
-        item_data.CatalogItemId = jsonData.CustomFields.CatalogItemId
-        item_data.CatalogAssetName = jsonData.CustomFields.CatalogAssetName
 
-        arrItems.push(item_data)
+          item_data.BuildVersionString = jsonData.BuildVersionString
+          item_data.AppNameString = jsonData.AppNameString
+          item_data.CatalogItemId = jsonData.CustomFields.CatalogItemId
+          item_data.CatalogAssetName = jsonData.CustomFields.CatalogAssetName
+
+          arrItems.push(item_data)
+        }
       }
     });
-
+console.log(arrItems)
   return arrItems
 })
 
