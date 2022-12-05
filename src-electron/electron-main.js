@@ -19,7 +19,6 @@ log.info('App starting...');
 let tray = null;
 
 
-
 contextMenu({
   showSaveImageAs: true,
   showLookUpSelection: true,
@@ -145,7 +144,7 @@ function createWindow() {
 
   mainWindow.webContents.setWindowOpenHandler((data) => {
     shell.openExternal(data.url);
-    return { action: "deny" };
+    return {action: "deny"};
   });
 
   if (process.env.DEBUGGING) {
@@ -282,7 +281,8 @@ ipcMain.handle('launchSniffer', async (_, args) => {
 ipcMain.handle('get_build_versions', async (_, args) => {
   let arrItems = []
   let vault_cache_path = args
-  console.log(vault_cache_path)
+  let jsonData
+
   fs.readdirSync(vault_cache_path, {withFileTypes: true})
     .filter(dirent => dirent.isDirectory())
     .forEach((element, index) => {
@@ -292,40 +292,45 @@ ipcMain.handle('get_build_versions', async (_, args) => {
       if (fs.existsSync(file)) {
 
         let data = fs.readFileSync(file);
-        let jsonData = JSON.parse(data.toString());
-        item_data.installed = false;
-        if (jsonData.CustomFields.InstallLocation) {
-          item_data.installed = true;
-          item_data.installed_location = jsonData.CustomFields.InstallLocation;
 
-          item_data.BuildVersionString = jsonData.BuildVersionString
-          item_data.AppNameString = jsonData.AppNameString
-          item_data.CatalogItemId = jsonData.CustomFields.CatalogItemId
-          item_data.CatalogAssetName = jsonData.CustomFields.CatalogAssetName
+        try {
+          jsonData = JSON.parse(data.toString())
+          item_data.installed = false;
+          if (jsonData.CustomFields.InstallLocation) {
+            item_data.installed = true;
+            item_data.installed_location = jsonData.CustomFields.InstallLocation;
 
-          arrItems.push(item_data)
+            item_data.BuildVersionString = jsonData.BuildVersionString
+            item_data.AppNameString = jsonData.AppNameString
+            item_data.CatalogItemId = jsonData.CustomFields.CatalogItemId
+            item_data.CatalogAssetName = jsonData.CustomFields.CatalogAssetName
+
+            arrItems.push(item_data)
+          }
+        } catch (error) {
+          console.log(error)
         }
       }
     });
-console.log(arrItems)
+
   return arrItems
 })
 
 ipcMain.handle('api_fetch', async (_, args) => {
   let fetch_options = args
-let response
-    if (fetch_options.method === 'POST') {
-      response = await fetch(fetch_options.url, {
-        method: fetch_options.method,
-        headers: fetch_options.headers,
-        body: fetch_options.body
-      });
-    } else {
-      response = await fetch(fetch_options.url, {
-        method: fetch_options.method,
-        headers: fetch_options.headers
-      });
-    }
+  let response
+  if (fetch_options.method === 'POST') {
+    response = await fetch(fetch_options.url, {
+      method: fetch_options.method,
+      headers: fetch_options.headers,
+      body: fetch_options.body
+    });
+  } else {
+    response = await fetch(fetch_options.url, {
+      method: fetch_options.method,
+      headers: fetch_options.headers
+    });
+  }
   let json = await response.json();
   return json
 })
