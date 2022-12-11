@@ -183,6 +183,12 @@ export default {
         field: 'buildVersion',
         editable: false,
         width: 270,
+      },
+      {
+        headerName: 'Compatible Version',
+        field: 'ue_version',
+        editable: false,
+        width: 270,
       }
     ];
     await this.loadGrid()
@@ -294,6 +300,19 @@ export default {
             break;
           }
         }
+
+        let release_info = catalog_item.releaseInfo
+        let ue_version = []
+
+        if(Array.isArray(release_info)) {
+          for (let info of release_info) {
+            let compatibleApps = info.compatibleApps[0]
+            if (compatibleApps) {
+              ue_version.push(compatibleApps)
+            }
+          }
+        }
+
         const catalog_row = await db.vault_library.where('catalogItemId').equals(catalog_item.id).first()
         if (catalog_row === undefined) {
           await db.vault_library.add({
@@ -302,7 +321,8 @@ export default {
             title: catalog_item.title,
             thumbnail_url: thumbnail_url,
             lastModifiedDate: catalog_item.lastModifiedDate,
-            buildVersion: buildVersion
+            buildVersion: buildVersion,
+            ue_version: ue_version
           })
         } else {
           await db.vault_library.update(catalog_item.id, {
@@ -310,7 +330,8 @@ export default {
             title: catalog_item.title,
             thumbnail_url: thumbnail_url,
             lastModifiedDate: catalog_item.lastModifiedDate,
-            buildVersion: buildVersion
+            buildVersion: buildVersion,
+            ue_version: ue_version
           })
         }
       }
