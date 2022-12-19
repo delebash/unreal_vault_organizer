@@ -11,7 +11,7 @@ Intro video: https://youtu.be/ywnvcVgiW3o (Older video -- there is a new process
 
 Download the latest version from the release pages https://github.com/delebash/unreal_vault_organizer/releases
 
-The win.zip file is for portable installs.  Just unzip. The exe will run the normal windows application installer.  
+ The exe will run the normal windows application installer. The exe has a built in update ability and will notify you and update when a new release is out.  The zip or portable version does not have this ability.
 
 Click on Unreal Vault Organizer. You will be asked for admin permission as this is necessary to obtain the Unreal authorization token using the built in network sniffer.
 
