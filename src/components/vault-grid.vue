@@ -43,7 +43,7 @@ import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import {db} from '../db';
 import {useQuasar, Notify} from 'quasar'
-
+import lodash from 'lodash'
 
 let fetch_options = {
   method: '',
@@ -247,6 +247,8 @@ export default {
           if (Array.isArray(entitlements) === true && entitlements.length > 0) {
             await this.getCatalogItems(catalog_url, entitlements, assets)
             start = start + count
+          } else if (i > 0 && entitlements.length === 0) {
+            break;
           } else if (i === 0 && entitlements.length === 0) {
             this.showNotify('Please request a new token', 'negative', 'top', 'report_problem')
             this.qt.loading.hide()
@@ -255,8 +257,9 @@ export default {
             if (entitlements.errorCode) {
               this.showNotify('Please request a new token', 'negative', 'top', 'report_problem')
               this.qt.loading.hide()
+              break;
             }
-            break
+            break;
           }
         }
         await this.loadGrid()
@@ -285,14 +288,18 @@ export default {
       fetch_options.url = catalog_url
       let items = await window.myNodeApi.api_fetch(fetch_options)
       for (let catalog_item of Object.values(items)) {
-        buildVersion = ''
-        for (let asset of assets) {
-          if (asset.catalogItemId === catalog_item.id) {
-            if (asset.buildVersion.length > 0) {
-              buildVersion = asset.buildVersion
-            }
+        //Get all build versions for asset
+        if (catalog_item.id === catalog_item.id) {
+          let assetsById = assets.filter(asset => asset.catalogItemId === catalog_item.id)
+          //Get latest build version for asset.
+          let orderedVersions = lodash.orderBy(assetsById, ['buildVersion'], ['desc']);
+          let version = orderedVersions[0]
+          if (version) {
+            buildVersion = version.buildVersion
           }
         }
+
+
         thumbnail_url = ''
         for (let keyImage of catalog_item.keyImages) {
           if (keyImage.type === 'Thumbnail') {
@@ -304,7 +311,7 @@ export default {
         let release_info = catalog_item.releaseInfo
         let ue_version = []
 
-        if(Array.isArray(release_info)) {
+        if (Array.isArray(release_info)) {
           for (let info of release_info) {
             let compatibleApps = info.compatibleApps[0]
             if (compatibleApps) {
@@ -346,7 +353,6 @@ export default {
         this.vault_cache_path = user_settings.vault_cache_path
 
         this.build_versions = await window.myNodeApi.get_build_versions(this.vault_cache_path)
-
         let catalogItems = await db.vault_library.toArray()
         this.rowData = await Promise.all(catalogItems.map(async catalogItem => {
           catalogItem.tags = await db.tags.where('id').anyOf([1]).toArray()
@@ -361,8 +367,8 @@ export default {
         if (this.updates === true) {
           this.showNotify('Updates available', 'secondary', 'top')
         }
-       // console.log("row count" + this.rowCount)
-        // this.qt.loading.hide()
+
+        this.qt.loading.hide()
       } else {
         this.showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
       }

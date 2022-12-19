@@ -292,13 +292,14 @@ ipcMain.handle('get_build_versions', async (_, args) => {
       if (fs.existsSync(file)) {
 
         let data = fs.readFileSync(file);
-
         try {
           jsonData = JSON.parse(data.toString())
           item_data.installed = false;
+          item_data.installed_location = "";
           if (jsonData.CustomFields.InstallLocation) {
             item_data.installed = true;
             item_data.installed_location = jsonData.CustomFields.InstallLocation;
+          }
 
             item_data.BuildVersionString = jsonData.BuildVersionString
             item_data.AppNameString = jsonData.AppNameString
@@ -306,7 +307,7 @@ ipcMain.handle('get_build_versions', async (_, args) => {
             item_data.CatalogAssetName = jsonData.CustomFields.CatalogAssetName
 
             arrItems.push(item_data)
-          }
+
         } catch (error) {
           console.log(error)
         }
