@@ -31,10 +31,18 @@
             </q-tab-panel>
             <q-tab-panel class="row q-pl-xs q-pt-xs q-pb-none q-ma-none" name="settings">
               <div class="q-md column" style="min-width: 600px;">
-                <q-input dense v-model="account_number" label="Account Number*" stack-label
+                <q-input dense v-model="account_number" label="Account Number *" stack-label
+                         :type="isPwd ? 'password' : 'text'"
                          lazy-rules
                          :rules="[ val => val && val.length > 0 || 'Please type something']"
                 >
+                  <template v-slot:append>
+                    <q-icon dense
+                            :name="isPwd ? 'visibility_off' : 'visibility'"
+                            class="cursor-pointer"
+                            @click="isPwd = !isPwd"
+                    />
+                  </template>
                 </q-input>.
                 <q-input dense v-model="unreal_token" label="Unreal Launcher Token *" stack-label
                          :type="isPwd ? 'password' : 'text'"
