@@ -6,9 +6,8 @@ A simple application that downloads your unreal vault inventory and allows you t
 
 ![](docs/images/Unreal_Vault_Organizer_I2PqaHAKlQ.png)
 
-Updated setup video 12/18/2022 by EagleTopGaming https://www.youtube.com/channel/UCpMUiLi9x8sQfpFDqfiHOqg usin new internal sniffer for authentication.
-
-Intro video: https://youtu.be/ywnvcVgiW3o (Older video -- there is a new process for getting the Unreal Auth token as described below.  The video is still relevant for application features.  You no longer need to install Fiddler.)
+# Features and Setup video:
+https://www.youtube.com/watch?v=GfciwwOcevA
 
 
 Download the latest version from the release pages https://github.com/delebash/unreal_vault_organizer/releases
