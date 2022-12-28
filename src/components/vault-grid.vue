@@ -351,7 +351,7 @@ export default {
         this.launcher_path = user_settings.launcher_path
         this.sniffer_path = user_settings.sniffer_path
         this.vault_cache_path = user_settings.vault_cache_path
-
+        this.updates = false
         this.build_versions = await window.myNodeApi.get_build_versions(this.vault_cache_path)
         let catalogItems = await db.vault_library.toArray()
         this.rowData = await Promise.all(catalogItems.map(async catalogItem => {
