@@ -16,18 +16,22 @@ Download the latest version from the release pages https://github.com/delebash/u
 
 Click on Unreal Vault Organizer. You will be asked for admin permission as this is necessary to obtain the Unreal authorization token using the built in network sniffer.
 
-# Support:
-Add issues in github
+## Support:
+https://discord.gg/2WkHWNDf8q
 
-Get help at my discord channel https://discord.gg/2WkHWNDf8q
+## My other projects:
 
-Other free Unreal projects:
-
+Unreal Mapbox Bridge  -  Import real world locations into UE as Landscapes
 https://github.com/delebash/UnrealMapboxBridgePlugin
 
-https://github.com/delebash/unreal_mapbox_bridge
+Unreal Vault Organizer -  Organize your Unreal Vault with Tags and get update notifications
+https://github.com/delebash/unreal_vault_organizer
 
+Texture From Mesh Creator - Creates a texture from a screen shot of a Mesh.  Main puporse for this was so I could easily capture the show print of my characters so I could stamp that texture into the landscape for footprint effects.
+https://github.com/delebash/TextureFromMeshCreator
 
+Global Environmental System (GES) -- This system integrates Ultra Dynamic Sky Weather (potentially any Weather System) with Megascan Foliage, Trees, Props, UE Water, Ambient Wind System, and various other Systems.
+https://github.com/delebash/UE_GlobalEnvironmentalSystem
 
 # Setup Instructions:
 
