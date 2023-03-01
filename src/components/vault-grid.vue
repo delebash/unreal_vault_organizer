@@ -39,8 +39,8 @@
 <script>
 
 import {ref} from 'vue'
-import "ag-grid-community/dist/styles/ag-grid.css";
-import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 import {db} from '../db';
 import {useQuasar, Notify} from 'quasar'
 import lodash from 'lodash'
