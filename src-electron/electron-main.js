@@ -174,6 +174,7 @@ function createWindow() {
   })
 
   mainWindow.once('ready-to-show', () => {
+    sendStatusToWindow({event: 'checking-for-update', msg: 'Checking for update...'});
     autoUpdater.checkForUpdates();
   });
 }

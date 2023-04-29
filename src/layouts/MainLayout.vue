@@ -129,6 +129,7 @@ export default {
   mounted: async function () {
 
     window.myNodeApi.receive("fromMain", (data) => {
+      console.log(data.event)
       if (data.event === 'update-downloaded') {
         let actions = [
           {
