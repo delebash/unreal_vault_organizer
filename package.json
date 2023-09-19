@@ -15,7 +15,37 @@
     "build": "quasar build --debug -m electron",
     "publish": "quasar build --debug -m electron -P always",
     "debug": "quasar dev --debug -m electron -t mat -- --remote-debugging-port=9222 --inspect-brk=5858"
-  },
+  },"build": {
+  "appId": "unreal_vault_organizer",
+  "productName": "Unreal Vault Organizer",
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "delebash",
+      "repo": "unreal_vault_organizer",
+      "private": false
+    }
+  ],
+  "win": {
+    "publish": [
+      "github"
+    ],
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      },
+      {
+        "target": "zip",
+        "arch": [
+          "x64"
+        ]
+      }
+    ]
+  }
+},
   "dependencies": {
     "-": "^0.0.1",
     "@quasar/extras": "^1.16.6",
