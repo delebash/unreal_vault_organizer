@@ -88,7 +88,10 @@
                 You need to run this once before clicking Get Token.  Two windows will open and
                 close.  You self signed ssl certs should be installed.
                 <q-btn class="q-pt-none" dense @click="installMtimSSL()" color="primary"
-                       label="Install Sniffer SSL Certificates"></q-btn>
+                       label="Install MITM Sniffer SSL Certificates"></q-btn>
+                <br>
+                <q-btn class="q-pt-none" dense @click="removeMtimSSL()" color="primary"
+                       label="Remove MITM SSL Certificates"></q-btn>
               </div>
             </q-tab-panel>
           </q-tab-panels>
@@ -156,6 +159,9 @@ export default {
 
     async installMtimSSL() {
       await window.myNodeApi.installMitmSSL()
+    },
+    async removeMtimSSL() {
+      await window.myNodeApi.removeMitmSSlCert()
     },
     async getToken() {
       let data = await window.myNodeApi.launchSniffer()

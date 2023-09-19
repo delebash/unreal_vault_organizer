@@ -264,7 +264,14 @@ ipcMain.handle('installMitmSSL', async (_, args) => {
   cmd_str = 'Start-Process -Verb RunAs -FilePath "certutil.exe" -ArgumentList "-addstore root $home/.mitmproxy/mitmproxy-ca-cert.cer"'
   execSync(cmd_str, {'shell': 'powershell.exe'});
 })
+ipcMain.handle('removeMitmSSlCert', async (_, args) => {
 
+  let cmd_str
+
+// Remove Certs
+  cmd_str = 'Start-Process -Verb RunAs -FilePath "certutil.exe" -ArgumentList "-delstore root mitmproxy"'
+  execSync(cmd_str, {'shell': 'powershell.exe'});
+})
 ipcMain.handle('launchSniffer', async (_, args) => {
   let cmd_str
   cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList "--mode transparent", "--scripts py_scripts/get_auth.py"'

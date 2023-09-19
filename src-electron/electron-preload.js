@@ -35,6 +35,8 @@ contextBridge.exposeInMainWorld('myNodeApi', {
   },
   installMitmSSL: async () =>
     ipcRenderer.invoke('installMitmSSL'),
+  removeMitmSSlCert: async () =>
+    ipcRenderer.invoke('removeMitmSSlCert'),
   launchSniffer: async () =>
     ipcRenderer.invoke('launchSniffer'),
   get_build_versions: async (vault_cache_path) =>
