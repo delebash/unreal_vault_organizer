@@ -15,7 +15,8 @@
     "build": "quasar build --debug -m electron",
     "publish": "quasar build --debug -m electron -P always",
     "debug": "quasar dev --debug -m electron -t mat -- --remote-debugging-port=9222 --inspect-brk=5858"
-  },"build": {
+  },
+  "build": {
   "appId": "unreal_vault_organizer",
   "productName": "Unreal Vault Organizer",
   "publish": [
