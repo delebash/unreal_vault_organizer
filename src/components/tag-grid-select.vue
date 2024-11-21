@@ -18,7 +18,7 @@
 
     <template v-slot:no-option>
       <q-item>
-        <q-item-section class="text-grey">
+        <q-item-section class="text-white">
           No results
         </q-item-section>
       </q-item>
@@ -42,6 +42,7 @@
         removable
         dense
         :color=scope.opt.color
+        text-color="white"
         @remove="scope.removeAtIndex(scope.index)"
         :tabindex="scope.tabindex"
         class="q-ma-none"
@@ -52,42 +53,38 @@
   </q-select>
 </template>
 
-<script>
+<script setup>
 
 import {ref} from 'vue'
-import {db} from "src/db";
+import {db} from "src/db.js";
 
-export default {
-  setup(props) {
-    return {
-      rowID: props.params.data.id,
-      tags: ref([]),
-      tags_listed: '',
-      tag_info_options: ref([]),
-    }
-  },
-  mounted: async function () {
-    await this.loadData()
-  },
-  methods: {
-    async updateTags(tags) {
-      let arrTags = []
-      for (let tag of tags) {
-        arrTags.push(tag.id)
-      }
-      await db.vault_library.update(this.params.data.catalogItemId, {
-        tagIds: arrTags
-      })
-    },
-    selectedTag(e) {
-    },
-    async loadData() {
-      this.tag_info_options = await db.tags.toArray()
-      this.tag_info_options = this.tag_info_options.sort((a, b) => (a.label > b.label) ? 1 : -1)
-      if (this.params.data.tagIds !== undefined) {
-        this.tags = await db.tags.where('id').anyOf(this.params.data.tagIds).toArray() || []
-      }
-    }
+
+const rowID = params.data.id
+const tags = ref([])
+const tags_listed = ''
+const tag_info_options = ref([])
+
+
+await loadData()
+
+async function updateTags(tags) {
+  let arrTags = []
+  for (let tag of tags) {
+    arrTags.push(tag.id)
+  }
+  await db.vault_library.update(params.data.catalogItemId, {
+    tagIds: arrTags
+  })
+}
+
+function selectedTag(e) {
+}
+
+async function loadData() {
+  tag_info_options.value = await db.tags.toArray()
+  tag_info_options.value = tag_info_options.value.sort((a, b) => (a.label > b.label) ? 1 : -1)
+  if (params.data.tagIds !== undefined) {
+    tags.value = await db.tags.where('id').anyOf(params.data.tagIds).toArray() || []
   }
 }
 </script>

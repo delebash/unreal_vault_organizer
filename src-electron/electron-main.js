@@ -1,20 +1,22 @@
 import {app, BrowserWindow, nativeTheme, Menu, ipcMain, shell, Tray, clipboard} from 'electron'
 
 import contextMenu from 'electron-context-menu';
-import path from 'path'
-import os from 'os'
 import {execSync} from "child_process";
 import * as fs from "fs";
 import fetch from 'node-fetch';
-
-import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
-// needed in case process is undefined under Linux
+import path from 'node:path'
+import os from 'node:os'
+import { fileURLToPath } from 'node:url'
+import pkg from 'electron-updater';
+const { autoUpdater } = pkg;
+import {ENDPOINTS, VARS} from 'src/globals.js'
+autoUpdater.logger = log;
+log.info('App starting...');
+
 const platform = process.platform || os.platform()
 
-autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
-log.info('App starting...');
+const currentDir = fileURLToPath(new URL('.', import.meta.url))
 
 let tray = null;
 
@@ -124,12 +126,14 @@ function createWindow() {
     width: 1000,
     height: 600,
     useContentSize: true,
-    icon: path.join(__dirname, 'icons/icon.ico'),
+    icon: path.resolve(currentDir, 'icons/icon.png'), // tray icon
     center: true,
     webPreferences: {
       contextIsolation: true,
-      // More info: /quasar-cli/developing-electron-apps/electron-preload-script
-      preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD)
+      preload: path.resolve(
+        currentDir,
+        path.join(process.env.QUASAR_ELECTRON_PRELOAD_FOLDER, 'electron-preload' + process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION)
+      )
     }
   })
 
@@ -253,39 +257,6 @@ function createTray() {
   return appIcon;
 }
 
-ipcMain.handle('installMitmSSL', async (_, args) => {
-
-  let cmd_str
-//Launch mitmproxy to create initial certs and close
-  cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList  "--scripts py_scripts/close_app.py"'
-  execSync(cmd_str, {'shell': 'powershell.exe'});
-
-// Install Certs
-  cmd_str = 'Start-Process -Verb RunAs -FilePath "certutil.exe" -ArgumentList "-addstore root $home/.mitmproxy/mitmproxy-ca-cert.cer"'
-  execSync(cmd_str, {'shell': 'powershell.exe'});
-})
-ipcMain.handle('removeMitmSSlCert', async (_, args) => {
-
-  let cmd_str
-
-// Remove Certs
-  cmd_str = 'Start-Process -Verb RunAs -FilePath "certutil.exe" -ArgumentList "-delstore root mitmproxy"'
-  execSync(cmd_str, {'shell': 'powershell.exe'});
-})
-ipcMain.handle('launchSniffer', async (_, args) => {
-  let cmd_str
-  cmd_str = 'Start-Process -Verb RunAs -Wait -FilePath "mitmproxy/mitmproxy.exe" -ArgumentList "--mode transparent", "--scripts py_scripts/get_auth.py"'
-  execSync(cmd_str, {'shell': 'powershell.exe'});
-  // if (args[0] === true) {
-  //   setTimeout(function() {
-  //     execFile(args[1])
-  //   }, 12000);
-  //
-  // }
-  let results = clipboard.readText()
-  return results
-})
-
 ipcMain.handle('get_build_versions', async (_, args) => {
   let arrItems = []
   let vault_cache_path = args
@@ -325,6 +296,23 @@ ipcMain.handle('get_build_versions', async (_, args) => {
   return arrItems
 })
 
+ipcMain.handle('get_ue_access_token', async (_, authCode) => {
+  const response = await fetch(ENDPOINTS.auth_code, {
+    method: 'post',
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code: authCode,
+      token_type: 'eg1'
+    }),
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${VARS.client_cred_base64}`,
+      'User-Agent': VARS.client_ua
+    }
+  })
+  return await response.json()
+})
+
 ipcMain.handle('api_fetch', async (_, args) => {
   let fetch_options = args
   let response
@@ -342,4 +330,24 @@ ipcMain.handle('api_fetch', async (_, args) => {
   }
   let json = await response.json();
   return json
+})
+ipcMain.handle('get_ue_vault', async (_, data) => {
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `${data.token_type} ${data.access_token}`,
+    'User-Agent': VARS.client_ua
+  }
+  // console.log(headers)
+  // console.log(data)
+
+  try {
+    const response = await fetch(data.url, {
+      headers: headers
+    })
+    let json = await response.json()
+    return json
+  } catch (error) {
+    console.log(error)
+  }
 })

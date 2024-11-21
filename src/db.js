@@ -1,9 +1,10 @@
 import Dexie from 'dexie';
 
 export const db = new Dexie('unreal_vault');
-db.version(4).stores({
+db.version(5).stores({
   vault_library: 'catalogItemId ,title, description, thumbnail_url, comment, *tagIds, updates_available, lastModifiedDate, buildVersion',
   user_settings: 'id ,account_number, unreal_token, vault_cache_path',
+  auth: 'id,auth',
   tags: '++id, label, value',
   color_palette: 'label, value'
 });

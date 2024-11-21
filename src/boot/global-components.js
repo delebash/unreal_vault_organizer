@@ -5,7 +5,7 @@ import TagGridSelect from '../components/tag-grid-select.vue'
 import CheckBoxGrid from '../components/checkbox-grid.vue'
 import {AgGridVue} from "ag-grid-vue3";
 import mitt from 'mitt'
-const eventBus = mitt()
+export const eventBus = mitt()
 
 export default boot(async ({app}) => {
   app.component('side-nav', SideNave)

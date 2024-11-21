@@ -33,14 +33,12 @@ contextBridge.exposeInMainWorld('myNodeApi', {
       ipcRenderer.on(channel, (event, ...args) => func(...args));
     }
   },
-  installMitmSSL: async () =>
-    ipcRenderer.invoke('installMitmSSL'),
-  removeMitmSSlCert: async () =>
-    ipcRenderer.invoke('removeMitmSSlCert'),
-  launchSniffer: async () =>
-    ipcRenderer.invoke('launchSniffer'),
   get_build_versions: async (vault_cache_path) =>
     ipcRenderer.invoke('get_build_versions', vault_cache_path),
   api_fetch: async (fetch_options) =>
-    ipcRenderer.invoke('api_fetch', fetch_options)
+    ipcRenderer.invoke('api_fetch', fetch_options),
+  get_ue_access_token: async (options) =>
+    ipcRenderer.invoke('get_ue_access_token', options),
+  get_ue_vault: async (options) =>
+    ipcRenderer.invoke('get_ue_vault', options)
 })

@@ -34,6 +34,7 @@
           <q-chip
             removable
             clickable
+            text-color="white"
             @dblclick="displayTag(tag)"
             @remove="removeTag(tag)"
             v-model:selected="tag.selected"
@@ -102,6 +103,7 @@
           <q-chip
             removable
             dense
+            text-color="white"
             :color="tag_color.value"
             @remove="scope.removeAtIndex(scope.index)"
             :tabindex="scope.tabindex"
@@ -116,160 +118,163 @@
   </q-dialog>
 </template>
 
-<script>
+<script setup>
 import {ref} from 'vue'
-import {db} from "src/db";
+import {db} from "src/db.js";
+import {eventBus} from "boot/global-components.js";
 
-export default {
-  setup() {
-    return {
-      tags: ref([]),
-      filter_by: ref('And'),
-      filter_by_options: ref(
-        [
-          {label: 'And', value: 'And'},
-          {label: 'Or', value: 'Or'}
-        ]
-      ),
-      new_tags: ref([]),
-      tag_clicked: {},
-      tag_info_options: ref([]),
-      selected_tags: [],
-      tag_edit: ref(false),
-      tag_label: ref(''),
-      tag_color: ref({}),
-      tag_color_options: ref([]),
+
+const tags = ref([])
+const filter_by = ref('And')
+const filter_by_options = ref(
+  [
+    {label: 'And', value: 'And'},
+    {label: 'Or', value: 'Or'}
+  ]
+)
+const new_tags = ref([])
+const tag_clicked = {}
+const tag_info_options = ref([])
+const selected_tags = []
+const tag_edit = ref(false)
+const tag_label = ref('')
+const tag_color = ref({})
+const tag_color_options = ref([])
+
+tag_color_options.value = await db.color_palette.orderBy('label').toArray()
+await loadData()
+
+
+function equalsIgnoreOrder(a, b) {
+  if (a.length !== b.length) return false;
+  const uniqueValues = new Set([...a, ...b]);
+  for (const v of uniqueValues) {
+    const aCount = a.filter(e => e === v).length;
+    const bCount = b.filter(e => e === v).length;
+    if (aCount !== bCount) return false;
+  }
+  return true;
+}
+
+async function filterByTags() {
+  let filteredRows = []
+  let tagIds = []
+  let operator = filter_by
+  if (selected_tags.value.length > 0) {
+    for (let tag of selected_tags.value) {
+      tagIds.push(tag.id)
     }
-  },
-  mounted: async function () {
-    this.tag_color_options = await db.color_palette.orderBy('label').toArray()
-   await this.loadData()
-  },
-  methods: {
-    equalsIgnoreOrder(a, b) {
-      if (a.length !== b.length) return false;
-      const uniqueValues = new Set([...a, ...b]);
-      for (const v of uniqueValues) {
-        const aCount = a.filter(e => e === v).length;
-        const bCount = b.filter(e => e === v).length;
-        if (aCount !== bCount) return false;
-      }
-      return true;
-    },
-    async filterByTags() {
-      let filteredRows = []
-      let tagIds = []
-      let operator = this.filter_by
-      if (this.selected_tags.length > 0) {
-        for (let tag of this.selected_tags) {
-          tagIds.push(tag.id)
-        }
-        if (typeof operator !== 'string') {
-          operator = operator.label
-        }
-        let rows
-        //Or
-        if (operator === 'Or' || tagIds.length === 1) {
-          filteredRows = await db.vault_library.where('tagIds').anyOf(tagIds).toArray()
-        } else if (operator === 'And') {
-          rows = await db.vault_library.toArray()
-          for (let row of rows) {
-            if (row.tagIds) {
-              if (row.tagIds.length > 0) {
-                const containsAll = tagIds.every(element => {
-                  return row.tagIds.includes(element);
-                });
-                if(containsAll === true){
-                  filteredRows.push(row)
-                }
-              }
+    if (typeof operator !== 'string') {
+      operator = operator.label
+    }
+    let rows
+    //Or
+    if (operator === 'Or' || tagIds.length === 1) {
+      filteredRows = await db.vault_library.where('tagIds').anyOf(tagIds).toArray()
+    } else if (operator === 'And') {
+      rows = await db.vault_library.toArray()
+      for (let row of rows) {
+        if (row.tagIds) {
+          if (row.tagIds.length > 0) {
+            const containsAll = tagIds.every(element => {
+              return row.tagIds.includes(element);
+            });
+            if (containsAll === true) {
+              filteredRows.push(row)
             }
           }
         }
-      } else {
-        filteredRows = await db.vault_library.toArray()
       }
-      //only unique rowsS
-      filteredRows = this.uniqBy(filteredRows, JSON.stringify)
-      this.eventBus.emit('filteredRows', {rows: filteredRows})
-    },
-    uniqBy(a, key) {
-      let seen = new Set();
-      return a.filter(item => {
-        let k = key(item);
-        return seen.has(k) ? false : seen.add(k);
-      });
-    },
-    selectedTag(tag) {
-      if (tag.selected === true) {
-        this.selected_tags.push(tag)
-      } else {
-        const index = this.selected_tags.findIndex(({label}) => label === tag.label);
-        this.selected_tags.splice(index, 1)
-      }
-    },
-    async saveTagInfo() {
-      this.tag_clicked.label = this.tag_label
-      this.tag_clicked.color = this.tag_color.value
-      this.tag_edit = false
-      await db.tags.put({
-        id: this.tag_clicked.id,
-        label: this.tag_clicked.label,
-        value: this.tag_clicked.value,
-        color: this.tag_clicked.color
-      })
-      this.eventBus.emit('refreshGrid', {})
-    },
-    async removeTag(tag) {
-      const index = this.tag_info_options.findIndex(({label}) => label === tag.label);
-      this.tag_info_options.splice(index, 1)
-      this.selected_tags.splice(index, 1)
-      await db.tags.delete(tag.id)
-      this.eventBus.emit('refreshGrid', {})
-    },
-    displayTag(tag) {
-      this.tag_color = {}
-      this.tag_edit = true
-      this.tag_clicked = tag
-      this.tag_label = tag.label
-      this.tag_color.value = tag.color
-      this.tag_color.label = tag.color
-    },
-    async createValue(val, done) {
-      // specific logic to eventually call done(...) -- or not
-      done(val, 'add-unique')
-      if (val.length > 0) {
-        val
-          .split(/[,;|]+/)
-          .map(v => v.trim())
-          .filter(v => v.length > 0)
-          .forEach(v => {
-            const found = this.tag_info_options.some(item => item.label === v);
-            if (found === false) {
-              let obj = {label: v, value: v, color: 'grey'}
-              this.new_tags.push(obj)
-            }
-          })
-        done(null)
-
-        for (let tag of this.new_tags) {
-          let id = await db.tags.add({
-            value: tag.value,
-            label: tag.label,
-            color: tag.color
-          })
-          tag.id = id
-          this.tag_info_options.push(tag)
-        }
-        this.tags = []
-        this.new_tags = []
-        this.eventBus.emit('refreshGrid', {})
-      }
-    },
-    async loadData() {
-      this.tag_info_options = await db.tags.toArray()
-      this.tag_info_options = this.tag_info_options.sort((a, b) => (a.label > b.label) ? 1 : -1)
     }
+  } else {
+    filteredRows = await db.vault_library.toArray()
   }
+  //only unique rowsS
+  filteredRows = uniqBy(filteredRows, JSON.stringify)
+  eventBus.emit('filteredRows', {rows: filteredRows})
+}
+
+function uniqBy(a, key) {
+  let seen = new Set();
+  return a.filter(item => {
+    let k = key(item);
+    return seen.has(k) ? false : seen.add(k);
+  });
+}
+
+function selectedTag(tag) {
+  if (tag.selected === true) {
+    selected_tags.value.push(tag)
+  } else {
+    const index = selected_tags.value.findIndex(({label}) => label === tag.label);
+    selected_tags.value.splice(index, 1)
+  }
+}
+
+async function saveTagInfo() {
+  tag_clicked.value.label = tag_label.value
+  tag_clicked.value.color = tag_color.value.value
+  tag_edit.value = false
+  await db.tags.put({
+    id: tag_clicked.value.id,
+    label: tag_clicked.value.label,
+    value: tag_clicked.value.value,
+    color: tag_clicked.value.color
+  })
+  eventBus.emit('refreshGrid', {})
+}
+
+async function removeTag(tag) {
+  const index = tag_info_options.value.findIndex(({label}) => label === tag.label);
+  tag_info_options.value.splice(index, 1)
+  selected_tags.value.splice(index, 1)
+  await db.tags.delete(tag.id)
+  eventBus.emit('refreshGrid', {})
+}
+
+function displayTag(tag) {
+  tag_color.value = {}
+  tag_edit.value = true
+  tag_clicked.value = tag
+  tag_label.value = tag.label
+  tag_color.value.value = tag.color
+  tag_color.value.label = tag.color
+}
+
+async function createValue(val, done) {
+  // specific logic to eventually call done(...) -- or not
+  done(val, 'add-unique')
+  if (val.length > 0) {
+    val
+      .split(/[,;|]+/)
+      .map(v => v.trim())
+      .filter(v => v.length > 0)
+      .forEach(v => {
+        const found = tag_info_options.value.some(item => item.label === v);
+        if (found === false) {
+          let obj = {label: v, value: v, color: 'grey'}
+          new_tags.value.push(obj)
+        }
+      })
+    done(null)
+
+    for (let tag of new_tags.value) {
+      let id = await db.tags.add({
+        value: tag.value,
+        label: tag.label,
+        color: tag.color
+      })
+      tag.id = id
+      tag_info_options.value.push(tag)
+    }
+    tags.value = []
+    new_tags.value = []
+    eventBus.emit('refreshGrid', {})
+  }
+}
+
+async function loadData() {
+  tag_info_options.value = await db.tags.toArray()
+  tag_info_options.value = tag_info_options.value.sort((a, b) => (a.label > b.label) ? 1 : -1)
 }
 </script>

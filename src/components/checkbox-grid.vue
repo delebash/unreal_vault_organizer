@@ -9,29 +9,21 @@
   />
 </template>
 
-<script>
+<script setup>
 import {ref} from 'vue'
-import {db} from "src/db";
+import {db} from "src/db.js";
 
-export default {
-  setup() {
-    return {
-      updates_available: ref('0')
+const updates_available = ref('0')
+
+await loadData()
+    async function loadData() {
+      updates_available.value = params.data.updates_available || '0'
     }
-  },
-  mounted: async function () {
-    await this.loadData()
-  },
-  methods: {
-    async loadData() {
-     this.updates_available = this.params.data.updates_available || '0'
-    },
-    async updateCheckbox(value) {
-      await db.vault_library.update(this.params.data.catalogItemId, {
-        updates_available: value
-      })
-    },
-  }
+
+async function updateCheckbox(value) {
+  await db.vault_library.update(params.data.catalogItemId, {
+    updates_available: value
+  })
 }
 </script>
 
