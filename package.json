@@ -1,60 +1,20 @@
 {
-  "name": "unreal_vault_organizer",
-  "version": "1.4.52",
-  "description": "Organize your unreal vault plugins",
+  "name": "unreal-vault-organizer",
+  "version": "0.0.1",
+  "description": "Organizer your Unreal Vault your way...",
   "productName": "Unreal Vault Organizer",
-  "author": "daniel <danelebash@hotmail.com>",
+  "author": "delebash <danelebash@hotmail.com>",
   "type": "module",
   "private": true,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/delebash/unreal_vault_organizer"
-  },
   "scripts": {
-    "start": "quasar dev -m electron",
-    "web": "quasar dev",
-    "build": "quasar build --debug -m electron",
-    "publish": "quasar build --debug -m electron -P always",
-    "debug": "quasar dev --debug -m electron -t mat -- --remote-debugging-port=9222 --inspect-brk=5858"
+    "test": "echo \"No test specified\" && exit 0",
+    "dev": "quasar dev -m electron",
+    "build": "quasar build"
   },
-  "build": {
-  "appId": "unreal_vault_organizer",
-  "productName": "Unreal Vault Organizer",
-  "publish": [
-    {
-      "provider": "github",
-      "owner": "delebash",
-      "repo": "unreal_vault_organizer",
-      "private": false
-    }
-  ],
-  "win": {
-    "publish": [
-      "github"
-    ],
-    "target": [
-      {
-        "target": "nsis",
-        "arch": [
-          "x64"
-        ]
-      },
-      {
-        "target": "zip",
-        "arch": [
-          "x64"
-        ]
-      }
-    ]
-  }
-},
   "dependencies": {
-    "-": "^0.0.1",
     "@quasar/extras": "^1.16.13",
-    "quasar": "^2.17.3",
-    "vue": "^3.5.13",
-    "vue-router": "^4.4.5",
-    "ag-grid-community": "^32.3.3",
+    "@vueuse/components": "^11.2.0",
+    "@vueuse/core": "^11.2.0",
     "ag-grid-vue3": "^32.3.3",
     "dexie": "^4.0.10",
     "electron-context-menu": "^4.0.4",
@@ -62,14 +22,15 @@
     "electron-updater": "^6.3.9",
     "lodash": "^4.17.21",
     "mitt": "^3.0.1",
-    "node-fetch": "^3.3.2"
+    "quasar": "^2.17.4",
+    "vue": "^3.5.13",
+    "vue-router": "^4.4.5"
   },
   "devDependencies": {
-    "electron-builder": "^25.1.8",
-    "@electron/packager": "^18.3.6",
     "@quasar/app-vite": "^2.0.0-beta.12",
     "autoprefixer": "^10.4.20",
     "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
     "postcss": "^8.4.49"
   }
 }

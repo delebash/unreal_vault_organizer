@@ -19,7 +19,7 @@
 import {contextBridge, ipcRenderer} from 'electron';
 
 
-contextBridge.exposeInMainWorld('myNodeApi', {
+contextBridge.exposeInMainWorld('node_api', {
   send: (channel, data) => {
     let validChannels = ["toMain"]
     if (validChannels.includes(channel)) {
@@ -35,8 +35,6 @@ contextBridge.exposeInMainWorld('myNodeApi', {
   },
   get_build_versions: async (vault_cache_path) =>
     ipcRenderer.invoke('get_build_versions', vault_cache_path),
-  api_fetch: async (fetch_options) =>
-    ipcRenderer.invoke('api_fetch', fetch_options),
   get_ue_access_token: async (options) =>
     ipcRenderer.invoke('get_ue_access_token', options),
   get_ue_vault: async (options) =>

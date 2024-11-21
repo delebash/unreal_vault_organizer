@@ -1,25 +1,19 @@
 import {app, BrowserWindow, nativeTheme, Menu, ipcMain, shell, Tray, clipboard} from 'electron'
-
-import contextMenu from 'electron-context-menu';
-import {execSync} from "child_process";
-import * as fs from "fs";
-import fetch from 'node-fetch';
-import log from 'electron-log';
 import path from 'node:path'
 import os from 'node:os'
-import { fileURLToPath } from 'node:url'
-import pkg from 'electron-updater';
-const { autoUpdater } = pkg;
-import {ENDPOINTS, VARS} from 'src/globals.js'
-autoUpdater.logger = log;
-log.info('App starting...');
+import {fileURLToPath} from 'node:url'
+import pkg from 'electron-updater'
 
+const {autoUpdater} = pkg
+import log from 'electron-log'
+import contextMenu from 'electron-context-menu'
+import {ENDPOINTS, VARS} from '../src/api/globals'
+// needed in case process is undefined under Linux
 const platform = process.platform || os.platform()
-
 const currentDir = fileURLToPath(new URL('.', import.meta.url))
 
-let tray = null;
-
+autoUpdater.logger = log
+log.info('App starting...')
 
 contextMenu({
   showSaveImageAs: true,
@@ -29,10 +23,8 @@ contextMenu({
   showSaveImage: true,
   showSaveLinkAs: true,
   showInspectElement: true,
-  showCopyImageAddress: true,
-});
-
-let mainWindow
+  showCopyImageAddress: true
+})
 const template = [
   {
     label: 'File',
@@ -113,23 +105,25 @@ const template = [
       {
         label: 'About',
         role: 'about'
-      },
+      }
     ]
   }
 ]
+let mainWindow
+
 
 function createWindow() {
   /**
    * Initial window options
    */
   mainWindow = new BrowserWindow({
+    icon: path.resolve(currentDir, 'icons/icon.png'), // tray icon
     width: 1000,
     height: 600,
     useContentSize: true,
-    icon: path.resolve(currentDir, 'icons/icon.png'), // tray icon
-    center: true,
     webPreferences: {
       contextIsolation: true,
+      // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
       preload: path.resolve(
         currentDir,
         path.join(process.env.QUASAR_ELECTRON_PRELOAD_FOLDER, 'electron-preload' + process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION)
@@ -137,23 +131,56 @@ function createWindow() {
     }
   })
 
+
+  // mainWindow.maximize()
+  // mainWindow.webContents.openDevTools()
+
+//Cors bypass
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    (details, callback) => {
+      const {requestHeaders} = details
+      UpsertKeyValue(requestHeaders, 'Access-Control-Allow-Origin', ['*'])
+      callback({requestHeaders})
+    }
+  )
+
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    const {responseHeaders} = details
+    UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Origin', ['*'])
+    UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Headers', ['*'])
+    callback({
+      responseHeaders
+    })
+  })
+
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
-  mainWindow.loadURL(process.env.APP_URL)
-  // This is the actual solution
-  // mainWindow.webContents.on("new-window", function (event, url) {
-  //   event.preventDefault();
-  //   shell.openExternal(url);
-  // });
 
-  mainWindow.webContents.setWindowOpenHandler((data) => {
-    shell.openExternal(data.url);
-    return {action: "deny"};
-  });
+  mainWindow.on('ready-to-show', () => {
+    mainWindow.show()
+  })
+
+  mainWindow.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url)
+    return {action: 'deny'}
+  })
+  mainWindow.once('ready-to-show', () => {
+    sendStatusToWindow({event: 'checking-for-update', msg: 'Checking for update...'})
+    autoUpdater.checkForUpdates()
+  })
+
+
+  if (process.env.DEV) {
+    mainWindow.loadURL(process.env.APP_URL)
+  } else {
+    mainWindow.loadFile('index.html')
+  }
 
   if (process.env.DEBUGGING) {
     // if on DEV or Production with debug enabled
-    mainWindow.webContents.closeDevTools()
+    mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools({mode: 'right'})
+    mainWindow.maximize()
   } else {
     // we're on production; no access to devtools pls
     mainWindow.webContents.on('devtools-opened', () => {
@@ -161,26 +188,9 @@ function createWindow() {
     })
   }
 
-  // mainWindow.on('minimize', function (event) {
-  //   event.preventDefault();
-  //   mainWindow.hide();
-  //   tray = createTray();
-  // });
-
-  // mainWindow.on('restore', function (event) {
-  //   mainWindow.show();
-  //   tray.destroy();
-  // });
-
-
   mainWindow.on('closed', () => {
     mainWindow = null
   })
-
-  mainWindow.once('ready-to-show', () => {
-    sendStatusToWindow({event: 'checking-for-update', msg: 'Checking for update...'});
-    autoUpdater.checkForUpdates();
-  });
 }
 
 app.whenReady().then(createWindow)
@@ -197,104 +207,6 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on("toMain", (event, data) => {
-  // Send result back to renderer process
-  // mainWindow.webContents.send("fromMain", 'jjjj');
-  if (data.event === 'restart') {
-    autoUpdater.quitAndInstall();
-  }
-})
-
-//Auto Updater
-autoUpdater.on('checking-for-update', () => {
-  sendStatusToWindow({event: 'checking-for-update', msg: 'Checking for update...'});
-})
-autoUpdater.on('update-available', (info) => {
-  sendStatusToWindow({event: 'update-available', msg: 'update-available'});
-})
-autoUpdater.on('update-not-available', (info) => {
-  sendStatusToWindow({event: 'update-not-available', msg: 'update-not-available'});
-})
-autoUpdater.on('error', (err) => {
-  sendStatusToWindow({event: 'error', msg: 'Error in auto-updater. ' + err});
-})
-autoUpdater.on('download-progress', (progressObj) => {
-  let log_message = "Download speed: " + progressObj.bytesPerSecond;
-  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-  sendStatusToWindow({event: 'download-progress', msg: log_message});
-})
-autoUpdater.on('update-downloaded', (info) => {
-  sendStatusToWindow({event: 'update-downloaded', msg: 'Update downloaded'});
-})
-
-function sendStatusToWindow(data) {
-  log.info(data.msg);
-  mainWindow.webContents.send('fromMain', data);
-}
-
-function createTray() {
-  let appIcon = new Tray(path.join(__dirname, "icon.ico"));
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Show', click: function () {
-        mainWindow.show();
-      }
-    },
-    {
-      label: 'Exit', click: function () {
-        app.isQuiting = true;
-        app.quit();
-      }
-    }
-  ]);
-
-  appIcon.on('double-click', function (event) {
-    mainWindow.show();
-  });
-  appIcon.setToolTip('Tray Tutorial');
-  appIcon.setContextMenu(contextMenu);
-  return appIcon;
-}
-
-ipcMain.handle('get_build_versions', async (_, args) => {
-  let arrItems = []
-  let vault_cache_path = args
-  let jsonData
-
-  fs.readdirSync(vault_cache_path, {withFileTypes: true})
-    .filter(dirent => dirent.isDirectory())
-    .forEach((element, index) => {
-      let item_data = {}
-
-      let file = path.join(vault_cache_path, element.name, 'manifest');
-      if (fs.existsSync(file)) {
-
-        let data = fs.readFileSync(file);
-        try {
-          jsonData = JSON.parse(data.toString())
-          item_data.installed = false;
-          item_data.installed_location = "";
-          if (jsonData.CustomFields.InstallLocation) {
-            item_data.installed = true;
-            item_data.installed_location = jsonData.CustomFields.InstallLocation;
-          }
-
-            item_data.BuildVersionString = jsonData.BuildVersionString
-            item_data.AppNameString = jsonData.AppNameString
-            item_data.CatalogItemId = jsonData.CustomFields.CatalogItemId
-            item_data.CatalogAssetName = jsonData.CustomFields.CatalogAssetName
-
-            arrItems.push(item_data)
-
-        } catch (error) {
-          console.log(error)
-        }
-      }
-    });
-
-  return arrItems
-})
 
 ipcMain.handle('get_ue_access_token', async (_, authCode) => {
   const response = await fetch(ENDPOINTS.auth_code, {
@@ -313,33 +225,13 @@ ipcMain.handle('get_ue_access_token', async (_, authCode) => {
   return await response.json()
 })
 
-ipcMain.handle('api_fetch', async (_, args) => {
-  let fetch_options = args
-  let response
-  if (fetch_options.method === 'POST') {
-    response = await fetch(fetch_options.url, {
-      method: fetch_options.method,
-      headers: fetch_options.headers,
-      body: fetch_options.body
-    });
-  } else {
-    response = await fetch(fetch_options.url, {
-      method: fetch_options.method,
-      headers: fetch_options.headers
-    });
-  }
-  let json = await response.json();
-  return json
-})
 ipcMain.handle('get_ue_vault', async (_, data) => {
 
   const headers = {
     'Content-Type': 'application/json',
-    'Authorization': `${data.token_type} ${data.access_token}`,
+    'Authorization': `${data.authData.token_type} ${data.authData.access_token}`,
     'User-Agent': VARS.client_ua
   }
-  // console.log(headers)
-  // console.log(data)
 
   try {
     const response = await fetch(data.url, {
@@ -351,3 +243,53 @@ ipcMain.handle('get_ue_vault', async (_, data) => {
     console.log(error)
   }
 })
+
+ipcMain.on('toMain', (event, data) => {
+  // Send result back to renderer process
+  // mainWindow.webContents.send("fromMain", 'jjjj');
+  if (data.event === 'restart') {
+    autoUpdater.quitAndInstall()
+  }
+})
+
+//Auto Updater
+autoUpdater.on('checking-for-update', () => {
+  sendStatusToWindow({event: 'checking-for-update', msg: 'Checking for update...'})
+})
+autoUpdater.on('update-available', (info) => {
+  sendStatusToWindow({event: 'update-available', msg: 'update-available'})
+})
+autoUpdater.on('update-not-available', (info) => {
+  sendStatusToWindow({event: 'update-not-available', msg: 'update-not-available'})
+})
+autoUpdater.on('error', (err) => {
+  sendStatusToWindow({event: 'error', msg: 'Error in auto-updater. ' + err})
+})
+autoUpdater.on('download-progress', (progressObj) => {
+  let log_message = 'Download speed: ' + progressObj.bytesPerSecond
+  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%'
+  log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')'
+  sendStatusToWindow({event: 'download-progress', msg: log_message})
+})
+autoUpdater.on('update-downloaded', (info) => {
+  sendStatusToWindow({event: 'update-downloaded', msg: 'Update downloaded'})
+})
+
+function sendStatusToWindow(data) {
+  log.info(data.msg)
+  mainWindow.webContents.send('fromMain', data)
+}
+
+function UpsertKeyValue(obj, keyToChange, value) {
+  const keyToChangeLower = keyToChange.toLowerCase()
+  for (const key of Object.keys(obj)) {
+    if (key.toLowerCase() === keyToChangeLower) {
+      // Reassign old key
+      obj[key] = value
+      // Done
+      return
+    }
+  }
+  // Insert at end instead
+  obj[keyToChange] = value
+}

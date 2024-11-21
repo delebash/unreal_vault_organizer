@@ -1,204 +1,201 @@
-
 <template>
+  <Suspense>
+    <q-layout view="hHh Lpr lff" class="rounded-borders">
+      <!--Begin Header-->
+      <q-header dense elevated>
+        <div class="row items-center">
+          <div class="col-3" @click="closeLeftDrawer">
+            <q-tabs
+              v-model="selectedTab"
+              align="left"
+              dense
+            >
+              <q-tab dense name="vault" label="Vault"/>
+              <q-tab dense name="settings" label="Settings"/>
+            </q-tabs>
+          </div>
+          <div class="row items-center">
+            <span class="q-mr-md">Quick Filter:</span>
+            <q-input dense v-model="quickfilter" color="black" id="filter-text-box" bg-color="white" filled placeholder="Search All Columns" @update:model-value="onFilterTextBoxChanged"></q-input>
+          </div>
+          <div class="col-grow" @click="closeLeftDrawer">
+            <div class="float-right">
+              <q-btn class="q-mr-sm" dense @click="importVault" color="green-9"
+                     label="Import Vault"></q-btn>
+              <q-btn class="q-mr-sm" dense @click="loadVault" color="orange-9"
+                     label="Refresh Grid"></q-btn>
+            </div>
+          </div>
+          <div class="col-shrink ">
+            <q-btn dense class="q-mr-sm" color="yellow-9" @click="toggleLeftDrawer">Tags</q-btn>
+          </div>
+        </div>
+      </q-header>
+      <!--End Header-->
 
-  <q-layout view="lhr lpr lfr">
-    <q-header dense elevated class="bg-primary text-white" height-hint="98">
-    </q-header>
-    <q-page-container>
+      <!--Begin Left Drawer-->
+      <q-drawer
+        v-model="leftDrawerOpen"
+        :width="200"
+        :breakpoint="500"
+        overlay
+        bordered
+        behavior="desktop"
+      >
+        <side-nav></side-nav>
+      </q-drawer>
+      <!--End Left Drawer-->
 
-      <q-page class="row no-margin q-pa-xs">
-        <q-card class="col-2">
-          <!-- drawer content -->
-          <side-nav></side-nav>
-        </q-card>
-        <q-card class="col-10">
-          <q-tabs
-            dense
-            v-model="selectedTab"
-            class="text-grey"
-            active-color="primary"
-            indicator-color="primary"
-            align="justify"
-            narrow-indicator
-          >
-            <q-tab dense name="vault" label="Vault"/>
-            <q-tab dense name="settings" label="Settings"/>
+      <!--Begin Main Page-->
+      <q-page-container @click="closeLeftDrawer">
+        <q-page style="background-color: green">
+          <q-tab-panels keep-alive v-model="selectedTab" animated>
+            <!--Begin Vault Tab-->
+            <q-tab-panel name="vault" class="q-pa-none q-ma-none"
+                         style="height: calc(100vh - 40px)">
 
-          </q-tabs>
-          <q-separator/>
-          <q-tab-panels class="q-pa-none q-ma-none" keep-alive v-model="selectedTab" animated>
-            <q-tab-panel name="vault" class="row q-pl-xs q-pt-xs q-pb-none q-ma-none"
-                         style="width: 100%; height: calc(100vh - 65px)">
-              <vault-grid class="col" ref="vaultGrid"></vault-grid>
+              <vault-grid ref="refVaultGrid"></vault-grid>
             </q-tab-panel>
+            <!--End Vault Tab-->
+
+            <!--Begin Settings Tab-->
             <q-tab-panel class="row q-pl-xs q-pt-xs q-pb-none q-ma-none" name="settings">
               <div class="q-md column" style="min-width: 600px;">
                 <a :href="`${getAuthUrl}`" target="_blank">Login to your Epic Account here and
-                  enter your authorization code after successful in the field below. Then click get authorization token.
-                  You will
-                  only need to do this step when your UE Auth Token Expires every so often</a>
-                <q-input dense v-model="authorizationCode" label="Authorization Code *" stack-label>
+                  enter your authorization code in the field below. Then click get access key. </a>
+                <q-input dense v-model="authorizationCode" label="Authorization Code" stack-label>
                 </q-input>
+                <br>
+                <q-btn class="q-pt-none" dense @click="authenticate()" color="positive"
+                       label="Authenticate"></q-btn>
 
-                <q-input dense v-model="unreal_token" label="Unreal Access Token *" stack-label
-                         :type="isPwd ? 'password' : 'text'"
-                         lazy-rules
-                         :rules="[ val => val && val.length > 0 || 'Please type something']"
-                >
-                  <template v-slot:append>
-                    <q-icon dense
-                            :name="isPwd ? 'visibility_off' : 'visibility'"
-                            class="cursor-pointer"
-                            @click="isPwd = !isPwd"
-                    />
-                  </template>
-                </q-input>
-                <q-input dense v-model="account_number" label="Account Number" stack-label
-                         :type="isPwd ? 'password' : 'text'"
-                         lazy-rules
-                         :rules="[ val => val && val.length > 0 || 'Please type something']"
-                >
-                  <template v-slot:append>
-                    <q-icon dense
-                            :name="isPwd ? 'visibility_off' : 'visibility'"
-                            class="cursor-pointer"
-                            @click="isPwd = !isPwd"
-                    />
-                  </template>
-                </q-input>
-                <q-input dense v-model="vault_cache_path" label="Vault Cache Path*" stack-label
+                <q-input dense v-model="cachePath" label="Vault Cache Path*" stack-label
                          lazy-rules
                          :rules="[ val => val && val.length > 0 || 'Please type something']"
                 >
                 </q-input>
 
-                <br>
-                <q-btn class="q-pt-none" dense @click="getAuthToken" color="primary"
-                       label="Get UE Authorization Token"></q-btn>
-                <br>
-                <q-btn class="q-pt-none" dense @click="saveUserSettings" color="positive"
+                <q-btn class="q-pt-none" dense @click="saveUserSettings()" color="positive"
                        label="Save settings"></q-btn>
+                <br>
               </div>
             </q-tab-panel>
+            <!--End Settings Tab-->
+
           </q-tab-panels>
-        </q-card>
-      </q-page>
-    </q-page-container>
-    <!--End Content Page-->
-
-  </q-layout>
-
+        </q-page>
+      </q-page-container>
+    </q-layout>
+  </Suspense>
 </template>
 
 <script setup>
-
-import {computed, ref, toRaw} from 'vue'
-import {useQuasar, Notify} from 'quasar'
-import SideNav from 'components/side-nav.vue';
-import {db} from '../db.js'
-import {color_palette} from '../quasar-color-palatte.js'
-import {ENDPOINTS, VARS} from "../globals.js";
-
+import {ref, computed, onMounted} from 'vue'
+import {useQuasar} from 'quasar'
+import {api} from '../api/api.js'
+import {db} from '../api/db.js'
+import VaultGrid from "components/VaultGrid.vue";
+import SideNav from "components/SideNav.vue";
+import {colorPalette} from '../utils/quasarColorPalatte.js'
+import {eventBus} from "boot/global-components.js";
 
 const $q = useQuasar()
-
-const authorizationCode = ref('')
-const vault_cache_path = ref('')
+const leftDrawerOpen = ref(false)
+const cachePath = ref('')
 const isPwd = ref(true)
 const selectedTab = ref('vault')
-const unreal_token = ref('')
-const account_number = ref('')
-const auth = ref('')
+const authorizationCode = ref('')
+const refVaultGrid = ref(null)
+const quickfilter = ref('')
 
-
-const getAuthUrl = computed(() => {
-  return ENDPOINTS.authenticate(VARS.client_id)
+onMounted(() => {
+  eventBus.on('refreshGrid', (args) => {
+    refVaultGrid.value.loadVault()
+  })
+  eventBus.on('filteredRows', (args) => {
+    refVaultGrid.value.filterRows(args)
+  })
 })
 
-
-//  window.myNodeApi.receive("fromMain", () > {
-// //   console.log(data.event)
-// // if (data.event === 'update-downloaded') {
-//   // let actions = [
-//   //   {
-//   //     label: 'Restart Now?', color: 'white', handler: () => {
-//   //       window.myNodeApi.send("toMain", {event: 'restart', msg: ''});
-//   //     }
-//   //   }
-//   // ]
-//   // showNotify('Update downloaded, ready to restart and install.', 'info', 'top', 'announcement', actions, 'white')
-// // }
-// )}
+function onFilterTextBoxChanged(){
+  // console.log('test')
+  refVaultGrid.value.onFilterTextBoxChanged(quickfilter.value)
+}
 
 
 await loadColorPalette()
 await loadData()
 
+
 async function loadColorPalette() {
-  for (let color of color_palette) {
-    await db.color_palette.put({
-      label: color,
-      value: color
+  let rows = await db.colorPalette.toArray()
+  if (rows.length === 0) {
+    for (let color of colorPalette) {
+      await db.colorPalette.put({
+        label: color,
+        value: color
+      })
+    }
+  }
+}
+
+function loadVault() {
+  // console.log('test')
+  refVaultGrid.value.loadVault()
+}
+
+function importVault() {
+  refVaultGrid.value.importVault()
+}
+
+//Settings
+async function loadData() {
+  if (await api.isAuthDataValid() === true) {
+    console.log('auth data is valid')
+    // loadVault()
+  } else {
+    console.log('data is not valid')
+    selectedTab.value = 'settings'
+    $q.notify({
+      type: 'warning',
+      message: 'Please verify your settings tab information',
+      timeout: 8000,
+      position: 'top'
     })
   }
 }
 
-async function getAuthToken() {
-  if (authorizationCode.value !== '') {
-    console.log('get auth')
-    auth.value = await window.myNodeApi.get_ue_access_token(authorizationCode.value)
-
-    console.log(auth.value)
-    await saveAuth()
-    await loadData()
-    authorizationCode.value = ''
-  } else {
-    console.log('no auth')
-  }
-}
-
-async function saveAuth() {
-  await db.auth.put({
-    id: 1,
-    auth: toRaw(auth.value)
-  })
-  unreal_token.value = auth.value.access_token
-  account_number.value = auth.value.account_id
-  await saveUserSettings()
-}
-
-async function getUserSettings(id) {
-  return db.user_settings.get(id)
-}
-
 async function saveUserSettings() {
-  await db.user_settings.put({
-    id: 1,
-    account_number: account_number.value,
-    unreal_token: unreal_token.value,
-    vault_cache_path: vault_cache_path.value,
-  })
+  let data = {cachePath: 'c:\test'}
+  await api.saveUserSettings(data)
 }
 
-function showNotify(msg, color, position, icon, actions, textColor) {
-  $q.notify({
-    message: msg,
-    color: color,
-    position: position,
-    icon: icon,
-    textColor: textColor,
-    actions: actions
-  })
-}
+//End Settings
 
-async function loadData() {
-  let user_settings = await db.user_settings.where("id").equals(1).first();
-  if (user_settings !== null && user_settings !== undefined) {
-    unreal_token.value = user_settings.unreal_token
-    account_number.value = user_settings.account_number
-    vault_cache_path.value = user_settings.vault_cache_path
-  } else {
-    showNotify('Please verify your settings tab information', 'negative', 'top', 'report_problem')
+//Begin Vault
+const getAuthUrl = computed(() => {
+  return api.getAuthUrl()
+})
+
+
+async function authenticate() {
+  if (authorizationCode.value !== 0) {
+    let auth = await api.authenticate(authorizationCode.value)
+    let data = {auth: auth}
+    await api.saveUserSettings(data)
   }
+}
+
+//End Vault
+
+//Begin Tags
+function closeLeftDrawer() {
+  if (leftDrawerOpen.value === true) {
+    leftDrawerOpen.value = false
+  }
+}
+
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value
 }
 </script>

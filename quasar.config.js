@@ -4,7 +4,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 
-import {configure} from 'quasar/wrappers'
+import { configure } from 'quasar/wrappers'
 
 
 export default configure((/* ctx */) => {
@@ -15,7 +15,10 @@ export default configure((/* ctx */) => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ["global-components"],
+    boot: [
+
+      'global-components',
+    ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: [
@@ -39,7 +42,7 @@ export default configure((/* ctx */) => {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
       target: {
-        browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
+        browser: [ 'es2022', 'firefox115', 'chrome115', 'safari14' ],
         node: 'node20'
       },
 
@@ -76,10 +79,7 @@ export default configure((/* ctx */) => {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
-      config: {
-        loading: { /* look at QuasarConfOptions from the API card */},
-        notify: { /* look at QuasarConfOptions from the API card */}
-      },
+      config: {},
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -92,10 +92,7 @@ export default configure((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: [
-        'Loading',
-        'Notify'
-      ]
+      plugins: ["Notify"]
     },
 
     // animations: 'all', // --- includes all animations
@@ -135,7 +132,7 @@ export default configure((/* ctx */) => {
       pwa: false
 
       // pwaOfflineHtmlFilename: 'offline.html', // do NOT use index.html as name!
-      // will mess up SSR
+                                                 // will mess up SSR
 
       // pwaExtendGenerateSWOptions (cfg) {},
       // pwaExtendInjectManifestOptions (cfg) {}
@@ -172,7 +169,7 @@ export default configure((/* ctx */) => {
       // extendPackageJson (json) {},
 
       // Electron preload scripts (if any) from /src-electron, WITHOUT file extension
-      preloadScripts: ['electron-preload'],
+      preloadScripts: [ 'electron-preload' ],
 
       // specify the debugging port to use for the Electron app when running in development mode
       inspectPort: 5858,
@@ -195,23 +192,7 @@ export default configure((/* ctx */) => {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'unreal_vault_organizer',
-        publish: {
-          'provider': 'github'
-        },
-        win: {// configuration parameters of installation software under Windows
-          requestedExecutionLevel: 'requireAdministrator',
-          target: [
-            "NSIS", // package as NSIS installation file
-            "Zip" // package as the installation file zip
-          ]
-        },
-        nsis: {// NSIS configuration parameters
-          oneClick: false, // click to open
-          deleteAppDataOnUninstall: true,
-          allowToChangeInstallationDirectory: true, // allows the user to choose the installation location
-          perMachine: true
-        }
+        appId: 'unreal-vault-organizer'
       }
     },
 
