@@ -1,5 +1,9 @@
 # Unreal Vault Organizer (unreal-vault-organizer)
 
+This repository is now archived.  Please check out the new Unreal Vault Organizer that works with fab
+https://github.com/delebash/unreal_vault_organizer_tauri/releases
+
+
 Organizer your Unreal Vault your way...
 
 ## Install the dependencies
